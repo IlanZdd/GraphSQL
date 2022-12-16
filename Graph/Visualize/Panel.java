@@ -18,96 +18,86 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class Panel extends JPanel {
-
-    enum showing {TABLE_INFO, HELP}
+    protected enum showing {TABLE_INFO, HELP}
     protected showing screen = showing.TABLE_INFO;
-    Rectangle sourceBtn;
-    Rectangle midBtn;
-    Rectangle wellBtn;
-    Rectangle externalBtn;
-    Rectangle changeColor;
-    Rectangle zoomOut;
-    Rectangle zoomIn;
-    Rectangle help;
-    Rectangle savingModeOn;
-    Rectangle doSave;
-    JTextField textField;
-    String textFieldText = "";
-    JTextArea info;
-    JScrollPane scrollPane;
-    String[] printedInfo = null;
-    static int btnWidth = (ConstantHandler.getPanelWidth()-2*ConstantHandler.getOffset()-6)/2;
-    static int btnHeight = 27;
+    private final Rectangle sourceBtn, midBtn, wellBtn, externalBtn, changeColor, zoomOut, zoomIn, help, savingModeOn, doSave;
+    protected JTextField textField;
+    protected String textFieldText = "";
+    private JTextArea info;
+    private JScrollPane scrollPane;
+    protected String[] printedInfo = null;
+    private static int btnWidth = (ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset()-6)/2;
+    private static final int btnHeight = 27;
 
     protected Panel() {
         super();
         setLayout(new FlowLayout());
 
-        sourceBtn = new Rectangle(0,0,
-                btnWidth, btnHeight);
-        midBtn = new Rectangle(0,0,
-                btnWidth, btnHeight);
-        wellBtn = new Rectangle(0,0,
-                btnWidth, btnHeight);
-        externalBtn = new Rectangle(0,0,
-                btnWidth, btnHeight);
+        sourceBtn = new Rectangle(0,0, btnWidth, btnHeight);
+        midBtn = new Rectangle(0,0, btnWidth, btnHeight);
+        wellBtn = new Rectangle(0,0, btnWidth, btnHeight);
+        externalBtn = new Rectangle(0,0, btnWidth, btnHeight);
 
-        changeColor = new Rectangle(ConstantHandler.getOffset(),
-                ConstantHandler.getHeightCanvas()-2*ConstantHandler.getOffset(),
-                ConstantHandler.getOffset(), ConstantHandler.getOffset());
-        zoomOut = new Rectangle(3*ConstantHandler.getOffset(),
-                ConstantHandler.getHeightCanvas()-2*ConstantHandler.getOffset(),
-                ConstantHandler.getOffset(), ConstantHandler.getOffset());
-        zoomIn = new Rectangle(5*ConstantHandler.getOffset(),
-                ConstantHandler.getHeightCanvas()-2*ConstantHandler.getOffset(),
-                ConstantHandler.getOffset(), ConstantHandler.getOffset());
-        help = new Rectangle(ConstantHandler.getPanelWidth()-2*ConstantHandler.getOffset(),
-                ConstantHandler.getOffset(),
-                ConstantHandler.getOffset(), ConstantHandler.getOffset());
-        savingModeOn = new Rectangle(ConstantHandler.getOffset(),
-                ConstantHandler.getHeightCanvas()-4*ConstantHandler.getOffset(),
-                ConstantHandler.getOffset(), ConstantHandler.getOffset());
-        doSave = new Rectangle(ConstantHandler.getPanelWidth()-2*ConstantHandler.getOffset(),
-                ConstantHandler.getHeightCanvas()-4*ConstantHandler.getOffset(),
-                ConstantHandler.getOffset(), ConstantHandler.getOffset());
+        help = new Rectangle(ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset(),
+                ValueContainer.getPanelOffset(),
+                ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset());
+        changeColor = new Rectangle(ValueContainer.getPanelOffset(),
+                ValueContainer.getCanvasHeight()-2* ValueContainer.getPanelOffset(),
+                ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset());
+        zoomOut = new Rectangle(3* ValueContainer.getPanelOffset(),
+                ValueContainer.getCanvasHeight()-2* ValueContainer.getPanelOffset(),
+                ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset());
+        zoomIn = new Rectangle(5* ValueContainer.getPanelOffset(),
+                ValueContainer.getCanvasHeight()-2* ValueContainer.getPanelOffset(),
+                ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset());
 
-
-        savingModeOn.setLocation(ConstantHandler.getOffset(),
-                ConstantHandler.getHeightCanvas()-4*ConstantHandler.getOffset());
-
+        savingModeOn = new Rectangle(ValueContainer.getPanelOffset(),
+                ValueContainer.getCanvasHeight()-4* ValueContainer.getPanelOffset(),
+                ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset());
+        savingModeOn.setLocation(ValueContainer.getPanelOffset(),
+                ValueContainer.getCanvasHeight()-4* ValueContainer.getPanelOffset());
+        doSave = new Rectangle(ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset(),
+                ValueContainer.getCanvasHeight()-4* ValueContainer.getPanelOffset(),
+                ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset());
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        setBackground(ConstantHandler.getPanelColor());
-        setMaximumSize(new Dimension(ConstantHandler.getPanelWidth(),
-                ConstantHandler.getHeightCanvas()));
-        setMinimumSize(new Dimension(ConstantHandler.getPanelWidth(),
-                ConstantHandler.getHeightCanvas()));
-        setPreferredSize(new Dimension(ConstantHandler.getPanelWidth(),
-                ConstantHandler.getHeightCanvas()));
+        setBackground(ValueContainer.getColorOfPanel());
+        setMaximumSize(new Dimension(ValueContainer.getPanelWidth(),
+                ValueContainer.getCanvasHeight()));
+        setMinimumSize(new Dimension(ValueContainer.getPanelWidth(),
+                ValueContainer.getCanvasHeight()));
+        setPreferredSize(new Dimension(ValueContainer.getPanelWidth(),
+                ValueContainer.getCanvasHeight()));
 
         if (this.getComponentCount() == 0 || scrollPane == null ||
                 !this.getComponent(0).equals(scrollPane)) {
             info = new JTextArea(){};
             scrollPane = new JScrollPane(info);
+
+            // Sets the scrollBar with the customized scrollBar
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             scrollPane.setComponentZOrder(scrollPane.getVerticalScrollBar(), 0);
             scrollPane.setComponentZOrder(scrollPane.getViewport(), 1);
             scrollPane.getVerticalScrollBar().setOpaque(false);
             scrollPane.setLayout(new ScrollPaneNewLayout());
             scrollPane.getVerticalScrollBar().setUI(new BarUI());
+
             add(scrollPane, 0);
         }
+
         if (this.getComponentCount() <= 1 || textField == null ||
                 !this.getComponent(1).equals(textField)) {
             textField = new JTextField();
+
+            //Sets the text field with the customized style
             textField.setOpaque(true);
             textField.setBorder(new TextFieldBorder());
-            textField.setFont(ConstantHandler.getPanelFont());
-            textField.setBackground(ConstantHandler.getPanelColor());
-            textField.setForeground(ConstantHandler.getWritingColor());
+            textField.setFont(ValueContainer.getPanelFont());
+            textField.setBackground(ValueContainer.getColorOfPanel());
+            textField.setForeground(ValueContainer.getWritingColor());
             textField.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyTyped(KeyEvent e) {
@@ -117,29 +107,29 @@ public class Panel extends JPanel {
             textField.setText(textFieldText);
             add(textField);
         }
-/*
-        if (this.getComponentCount() <= 2 || sourceBtn == null ||
-                !this.getComponent(2).equals(sourceBtn)) {
-            sourceBtn = new RestyledButton("Source");
-            add(sourceBtn);
-        }*/
+
         render(g);
     }
 
     protected void render(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setFont(ConstantHandler.getPanelFont());
+        g2d.setFont(ValueContainer.getPanelFont());
         FontMetrics fm = g2d.getFontMetrics();
-        g2d.setColor(ConstantHandler.getWritingColor());
 
-        changeColor.setLocation(ConstantHandler.getOffset(),
-                ConstantHandler.getHeightCanvas()-2*ConstantHandler.getOffset());
-        zoomOut.setLocation(3*ConstantHandler.getOffset(),
-                ConstantHandler.getHeightCanvas()-2*ConstantHandler.getOffset());
-        zoomIn.setLocation(5*ConstantHandler.getOffset(),
-                ConstantHandler.getHeightCanvas()-2*ConstantHandler.getOffset());
-        help.setLocation(ConstantHandler.getPanelWidth()-2*ConstantHandler.getOffset(),
-                ConstantHandler.getOffset());
+        g2d.setColor(ValueContainer.getWritingColor());
+
+        //Sets the util buttons locations
+        changeColor.setLocation(ValueContainer.getPanelOffset(),
+                ValueContainer.getCanvasHeight()-2* ValueContainer.getPanelOffset());
+        zoomOut.setLocation(3* ValueContainer.getPanelOffset(),
+                ValueContainer.getCanvasHeight()-2* ValueContainer.getPanelOffset());
+        zoomIn.setLocation(5* ValueContainer.getPanelOffset(),
+                ValueContainer.getCanvasHeight()-2* ValueContainer.getPanelOffset());
+        help.setLocation(ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset(),
+                ValueContainer.getPanelOffset());
+
+        // draws the util Buttons
+
         //help
         g2d.draw(help);
 
@@ -158,39 +148,51 @@ public class Panel extends JPanel {
         g2d.drawString("+", zoomIn.x+zoomIn.width/2-fm.stringWidth("+")/2,
                 zoomIn.y+zoomIn.height-fm.getAscent()/2);
 
+        // Don't know if I'm showing this yet
         scrollPane.setVisible(false);
+
+        // If we are on the first panel
         if (screen == showing.TABLE_INFO) {
-            //help
+            //write the help button label as ?
             g2d.drawString("?", help.x+help.width/2-fm.stringWidth("?")/2,
                     help.y+help.height-fm.getAscent()/2);
 
-            g2d.drawString(Handler.graph.getName().toUpperCase() + " :: " + Handler.graph.getTableNumber() + " tables", ConstantHandler.getOffset(), ConstantHandler.getOffset()+fm.getHeight());
+            //write the graph name and number of table
+            String graphName = Handler.graph.getName();
+            graphName = graphName.substring(
+                    ((graphName.lastIndexOf('/') != -1) ? graphName.lastIndexOf('/')+1 :
+                            ((graphName.lastIndexOf('\\') != -1) ? graphName.lastIndexOf('\\')+1 : 0)));
+            graphName = graphName.substring(0,
+                    (graphName.indexOf('.') != -1) ? graphName.indexOf('.') : graphName.length());
+            g2d.drawString(graphName.toUpperCase() + " :: " + Handler.graph.getTableNumber() + " tables",
+                    ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset()+fm.getHeight());
 
-            int atThisPointY = fm.getHeight()+2*ConstantHandler.getOffset();
-            Rectangle container = new Rectangle(ConstantHandler.getOffset(), atThisPointY,
-                    ConstantHandler.getPanelWidth()-2*ConstantHandler.getOffset(), 60);
+            //draw the buttons
+            int atThisPointY = fm.getHeight()+2* ValueContainer.getPanelOffset();
+            Rectangle container = new Rectangle(ValueContainer.getPanelOffset(), atThisPointY,
+                    ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset(), 60);
             g2d.draw(container);
 
-            btnWidth = (ConstantHandler.getPanelWidth()-2*ConstantHandler.getOffset()-6)/2;
+            btnWidth = (ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset()-6)/2;
 
             sourceBtn.setSize(btnWidth, btnHeight);
             midBtn.width = btnWidth;
             wellBtn.width = btnWidth;
             externalBtn.width = btnWidth;
 
-            sourceBtn.setLocation(ConstantHandler.getOffset()+2, atThisPointY+2);
-            midBtn.setLocation(ConstantHandler.getOffset()+4+btnWidth, atThisPointY+2);
-            wellBtn.setLocation(ConstantHandler.getOffset()+2, atThisPointY+4+btnHeight);
-            externalBtn.setLocation(ConstantHandler.getOffset()+4+btnWidth, atThisPointY+4+btnHeight);
-            g2d.setColor(ConstantHandler.getPanelBtnColor());
+            sourceBtn.setLocation(ValueContainer.getPanelOffset()+2, atThisPointY+2);
+            midBtn.setLocation(ValueContainer.getPanelOffset()+4+btnWidth, atThisPointY+2);
+            wellBtn.setLocation(ValueContainer.getPanelOffset()+2, atThisPointY+4+btnHeight);
+            externalBtn.setLocation(ValueContainer.getPanelOffset()+4+btnWidth, atThisPointY+4+btnHeight);
+            g2d.setColor(ValueContainer.getColorOfPanelButton());
 
-            switch (ConstantHandler.getSelectedType()) {
+            switch (ValueContainer.getSelectedType()) {
                 case source -> g2d.fill(sourceBtn);
                 case mid_node -> g2d.fill(midBtn);
                 case well -> g2d.fill(wellBtn);
                 case external_node -> g2d.fill(externalBtn);
             }
-            g2d.setColor(ConstantHandler.getWritingColor());
+            g2d.setColor(ValueContainer.getWritingColor());
 
             g2d.draw(sourceBtn);
             g2d.draw(midBtn);
@@ -206,15 +208,16 @@ public class Panel extends JPanel {
             g2d.drawString("External", externalBtn.x+btnWidth/2-fm.stringWidth("External")/2,
                     externalBtn.y+fm.getHeight()+fm.getAscent()/2);
 
-            atThisPointY += 6+2*btnHeight+ConstantHandler.getOffset();
+            atThisPointY += 6+2*btnHeight+ ValueContainer.getPanelOffset();
 
+            // writes the info if a node is selected, or we are in help panel
             if (printedInfo != null && printedInfo.length > 0) {
                 renderInfo(atThisPointY, printedInfo);
             }
 
-            savingModeOn.setLocation(ConstantHandler.getOffset(),
-                    ConstantHandler.getHeightCanvas()-4*ConstantHandler.getOffset());
-
+            //draws the floppy disk and the saving part
+            savingModeOn.setLocation(ValueContainer.getPanelOffset(),
+                    ValueContainer.getCanvasHeight()-4* ValueContainer.getPanelOffset());
             g2d.draw(savingModeOn);
             g2d.draw(new Rectangle(savingModeOn.x+2, savingModeOn.y+2,
                     savingModeOn.width-4, 3));
@@ -222,11 +225,11 @@ public class Panel extends JPanel {
                     savingModeOn.width-4, savingModeOn.height-8));
 
             textField.setBounds(savingModeOn.x+savingModeOn.width+4,
-                    ConstantHandler.getHeightCanvas()-4*ConstantHandler.getOffset(),
-                    doSave.x-(savingModeOn.x+savingModeOn.width+8), ConstantHandler.getOffset());
-            if (ConstantHandler.isSavingMode()){
-                doSave.setLocation(ConstantHandler.getPanelWidth()-2*ConstantHandler.getOffset(),
-                        ConstantHandler.getHeightCanvas()-4*ConstantHandler.getOffset());
+                    ValueContainer.getCanvasHeight()-4* ValueContainer.getPanelOffset(),
+                    doSave.x-(savingModeOn.x+savingModeOn.width+8), ValueContainer.getPanelOffset());
+            if (ValueContainer.isSavingMode()){
+                doSave.setLocation(ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset(),
+                        ValueContainer.getCanvasHeight()-4* ValueContainer.getPanelOffset());
                 g2d.draw(doSave);
                 g2d.drawString("V", doSave.x+doSave.width/2-fm.stringWidth("V")/2, doSave.y+doSave.height-fm.getAscent()/2);
 
@@ -246,31 +249,34 @@ public class Panel extends JPanel {
             infoStrings = new String[]{"Help:", "",
                     "Click on a node to highlight it and its tree","",
                     "Click on a nodeType button to highlight those of selected type","",
-                    "Click on the canvas to revert any selection", "",
                     "Click and drag a node to move it", "",
                     "Click and drag the canvas to move the camera","",
-                    "In saving mode, move the blue circles to delimit the area to save"};
+                    "Open the saving mode by clicking on the floppy disk", "",
+                    "In saving mode, move the blue circles to delimit the area you wish to capture", "",
+                    "In saving mode, you can write a filename, before confirming by clicking the \"V\"", "",
+                    "Click anywhere else to revert any selection", ""};
 
-            renderInfo(help.y+help.height+ConstantHandler.getOffset(), infoStrings);
+            renderInfo(help.y+help.height+ ValueContainer.getPanelOffset(), infoStrings);
         }
         g2d.dispose();
     }
 
     private void renderInfo(int atThisPointY, String[] toPrint) {
         info.setText(null);
-        scrollPane.setBounds(new Rectangle(ConstantHandler.getOffset(), atThisPointY,
-                ConstantHandler.getPanelWidth() - 2 * ConstantHandler.getOffset(),
-                ConstantHandler.getHeightCanvas() - atThisPointY - 5*ConstantHandler.getOffset()));
-        scrollPane.setBackground(ConstantHandler.getPanelPanelColor());
+        scrollPane.setBounds(new Rectangle(ValueContainer.getPanelOffset(), atThisPointY,
+                ValueContainer.getPanelWidth() - 2 * ValueContainer.getPanelOffset(),
+                ValueContainer.getCanvasHeight() - atThisPointY - 5* ValueContainer.getPanelOffset()));
+        scrollPane.setBackground(ValueContainer.getColorOfInfoPanel());
         info.setBounds(0,0, scrollPane.getWidth()-scrollPane.getVerticalScrollBar().getWidth(), scrollPane.getHeight());
-        info.setBorder(new MatteBorder(2,2,2,2+scrollPane.getVerticalScrollBar().getWidth(), ConstantHandler.getPanelPanelColor()));
-        info.setBackground(ConstantHandler.getPanelPanelColor());
-        info.setForeground(ConstantHandler.getWritingColor());
-        info.setFont(ConstantHandler.getPanelFont());
+        info.setBorder(new MatteBorder(2,2,2,2+scrollPane.getVerticalScrollBar().getWidth(), ValueContainer.getColorOfInfoPanel()));
+        info.setBackground(ValueContainer.getColorOfInfoPanel());
+        info.setForeground(ValueContainer.getWritingColor());
+        info.setFont(ValueContainer.getPanelFont());
         info.setLineWrap(true);
         info.setWrapStyleWord(true);
         info.setVisible(true);
 
+        // Writing the table info
         if (screen == showing.TABLE_INFO) {
             info.append("Table: " + printedInfo[0].toUpperCase());
             info.append("\n Type: " + printedInfo[1].toUpperCase());
@@ -316,14 +322,15 @@ public class Panel extends JPanel {
                 }
             }
         } else {
-            for ( String s : toPrint)
+            for (String s : toPrint)
                 info.append(s + "\n" );
         }
         info.setEditable(false);
-        info.setBackground(ConstantHandler.getPanelPanelColor());
-        scrollPane.setBackground(ConstantHandler.getPanelPanelColor());
-        scrollPane.setVisible(true);
+        info.setBackground(ValueContainer.getColorOfInfoPanel());
+        scrollPane.setBackground(ValueContainer.getColorOfInfoPanel());
+        //scroll back to top
         info.setCaretPosition(0);
+        scrollPane.setVisible(true);
     }
 
     protected void updateINfo (String[] tableInfo) {
@@ -331,6 +338,7 @@ public class Panel extends JPanel {
     }
 
     protected Graph.nodeType pressingOnSomething(Point point) {
+        //clicking on help/back
         if (help.contains(point)) {
             if (screen == showing.HELP)
                 screen = showing.TABLE_INFO;
@@ -338,44 +346,44 @@ public class Panel extends JPanel {
             return Graph.nodeType.unknown;
         }
 
+        //changing color
         if (changeColor.contains(point)) {
-            ConstantHandler.changeTheme();
+            ValueContainer.changeTheme();
             return Graph.nodeType.unknown;
         }
 
         if (zoomIn.contains(point)) {
-            ConstantHandler.zoomIn();
+            ValueContainer.zoomIn();
             return Graph.nodeType.unknown;
         }
         if (zoomOut.contains(point)) {
-            ConstantHandler.zoomOut();
+            ValueContainer.zoomOut();
             return Graph.nodeType.unknown;
         }
 
-
         if (screen == showing.TABLE_INFO) {
             if (savingModeOn.contains(point)) {
-                ConstantHandler.setSavingMode();
+                ValueContainer.setSavingMode();
                 return Graph.nodeType.unknown;
             }
-            if (sourceBtn.contains(point) && ConstantHandler.getSelectedType() != Graph.nodeType.source)
+            if (sourceBtn.contains(point) && ValueContainer.getSelectedType() != Graph.nodeType.source)
                 return Graph.nodeType.source;
-            if (midBtn.contains(point) && ConstantHandler.getSelectedType() != Graph.nodeType.mid_node)
+            if (midBtn.contains(point) && ValueContainer.getSelectedType() != Graph.nodeType.mid_node)
                 return Graph.nodeType.mid_node;
-            if (externalBtn.contains(point) && ConstantHandler.getSelectedType() != Graph.nodeType.external_node)
+            if (externalBtn.contains(point) && ValueContainer.getSelectedType() != Graph.nodeType.external_node)
                 return Graph.nodeType.external_node;
-            if (wellBtn.contains(point) && ConstantHandler.getSelectedType() != Graph.nodeType.well)
+            if (wellBtn.contains(point) && ValueContainer.getSelectedType() != Graph.nodeType.well)
                 return Graph.nodeType.well;
         }
         return  Graph.nodeType.unknown;
     }
 
     protected boolean amISaving(Point point) {
-        return ConstantHandler.isSavingMode() && doSave.contains(point)
+        return ValueContainer.isSavingMode() && doSave.contains(point)
                 && screen == showing.TABLE_INFO;
     }
 
-    public static class ScrollPaneNewLayout extends ScrollPaneLayout{
+    protected static class ScrollPaneNewLayout extends ScrollPaneLayout{
         @Override
         public void layoutContainer(Container parent) {
             JScrollPane scrollPane = (JScrollPane)parent;
@@ -405,7 +413,7 @@ public class Panel extends JPanel {
         }
     }
 
-    public static class BarUI extends BasicScrollBarUI {
+    protected static class BarUI extends BasicScrollBarUI {
         private final Dimension d = new Dimension();
         @Override protected JButton createDecreaseButton(int orientation) {
             return new JButton() {
@@ -428,9 +436,9 @@ public class Panel extends JPanel {
             if(!c.isEnabled() || r.width>r.height) {
                 return;
             } else if(isDragging) {
-                color = ConstantHandler.getPanelColor();
+                color = ValueContainer.getColorOfPanel();
             }else {
-                color = ConstantHandler.getPanelPanelColor();
+                color = ValueContainer.getColorOfInfoPanel();
             }
             g2.setPaint(color);
             g2.fillRect(r.x,r.y,r.width,r.height);
@@ -446,15 +454,15 @@ public class Panel extends JPanel {
             if (!sb.isEnabled() || r.width>r.height) {
                 return;
             } else if (isDragging) {
-                color = ConstantHandler.getScrollBarColor();
+                color = ValueContainer.getColorOfScrollBar();
             } else if (isThumbRollover()) {
-                color = ConstantHandler.getPanelBtnColor();
+                color = ValueContainer.getColorOfPanelButton();
             } else {
-                color = ConstantHandler.getPanelColor();
+                color = ValueContainer.getColorOfPanel();
             }
             g2.setPaint(color);
             g2.fillRoundRect(r.x,r.y,r.width,r.height,10,10);
-            g2.setPaint(ConstantHandler.getBackgroundColor());
+            g2.setPaint(ValueContainer.getBackgroundColor());
             g2.drawRoundRect(r.x,r.y,r.width,r.height,10,10);
             g2.dispose();
         }
@@ -465,59 +473,20 @@ public class Panel extends JPanel {
         }
     }
 
-    public static class TextFieldBorder implements Border {
-
+    protected static class TextFieldBorder implements Border {
         @Override
         public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-            g.setColor(ConstantHandler.getWritingColor());
+            g.setColor(ValueContainer.getWritingColor());
             g.drawLine(x, y+height, x+width, y+height);
             g.dispose();
         }
-
         @Override
         public Insets getBorderInsets(Component c) {
             return new Insets(0,0,0,0);
         }
-
         @Override
         public boolean isBorderOpaque() {
             return false;
-        }
-    }
-
-    public static class RestyledButton extends JButton {
-        private final String text;
-        public RestyledButton(String text) {
-            this.text = text;
-            setBorderPainted(false);
-            setContentAreaFilled(false);
-        }
-
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-
-            setSize(btnWidth, btnHeight);
-            setFont(ConstantHandler.getPanelFont());
-            setForeground(ConstantHandler.getWritingColor());
-            setText(text);
-            setBorder(new MatteBorder(1,1,1,1,ConstantHandler.getWritingColor()));
-            //setOpaque(true);
-
-            Color color;
-
-            if (getModel().isRollover()) {
-                color = ConstantHandler.getPanelBtnColor();
-            } else if (getModel().isSelected()) {
-                color = ConstantHandler.getScrollBarColor();
-            } else {
-                color = ConstantHandler.getPanelColor();
-            }
-            setBackground(color);
-            //g2d.setColor(color);
-            //g2d.fill(this.getBounds());
-
-            //g2d.setColor(ConstantHandler.getWritingColor());
-            //g2d.draw(this.getBounds());
         }
     }
 }

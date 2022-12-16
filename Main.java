@@ -6,7 +6,7 @@ import java.util.Arrays;
 public class Main {
     public static void main (String[] args) throws Exception {
         DBConnection.setConn("sqlite", "", "", "", "/home/ilan/Downloads/pokemon_db.db");
-        Graph g = new Graph("sqlite", DBConnection.getConn(), "/home/ilan/Downloads/pokemon_db.db");
+        Graph g = new Graph("sqlite", DBConnection.getConn(), "/home/ilan/Downloads/pokemon_db.db");/*
         Graph g1 = new Graph("sqlite", "", "", "", "/home/ilan/Downloads/pokemon_db.db");
 
         System.out.println("\t" + "graph name : " + g.getName());
@@ -67,7 +67,7 @@ public class Main {
             System.out.println("\t" + "columns : " + Arrays.toString(g.getColumnsInTable(s).toArray()));
             System.out.println("\t" + "plain columns : " + Arrays.toString(g.getPlainColumnsInTable(s).toArray()));
             for (Column st : g.getColumnsInTable(s))
-                System.out.println("\t" + "\tsearching " + st.getName() + ": " + g.searchColumnInTable(st.getName(), s).getName());
+                System.out.println("\t" + "\t searching " + st.getName() + ": " + g.searchColumnInTable(st.getName(), s).getName());
 
             System.out.println("\t" + "type : " + g.getTableType(s));
             System.out.println("\t" + "table tree : " + Arrays.toString(g.getTreeByTable(s).toArray()));
@@ -76,7 +76,7 @@ public class Main {
             for (Column st : g.getColumnsInTable(s))
                 System.out.println("\t" + "\tis "+ st.getName() + " bad: " + g.isArcInTableProblematic(s, st.getName()));
 
-        }
+        }*/
         g.visualize();
     }
 }

@@ -9,48 +9,49 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Handler {
-    static Graph graph;
-    static double modifier = 1;
-    static Point take_from_here = new Point(640, 640/12*9);
-    static Point take_to_here = new Point();
-    LinkedList<NodeObj> nodeHandler = new LinkedList<>();
-    LinkedList<ArcObj> arcHandler = new LinkedList<>();
-    int anInt = 4;
+    protected static Graph graph;
+    protected static double modifier = 1;
+    protected static Point take_from_here = new Point(640, 640/12*9);
+    protected static Point take_to_here = new Point();
+    protected LinkedList<NodeObject> nodeHandler = new LinkedList<>();
+    protected LinkedList<ArcObject> arcHandler = new LinkedList<>();
+    protected int anInt = 4;
 
-    public Handler(Graph graph) {
+    protected Handler(Graph graph) {
         Handler.graph = graph;
         addComponents();
     }
-
 
     private void addComponents() {
         int y = 50;
 
         //adds nodes according to topological order, from top to bottom
         for (String node : graph.sortTopological()) {
-            addNode(new NodeObj(ConstantHandler.getWidthCanvas()/ 2, y, node));
-            ConstantHandler.setNodeSizeByTextLength(node.length());
+            addNode(new NodeObject(ValueContainer.getCanvasWidth()/ 2, y, node));
+            ValueContainer.setNodeSizeByTextLength(node.length());
             y += 50;
         }
-        HashMap<String, Integer> map = new HashMap<>();
 
         //adds arcs between nodes
-        for (NodeObj fromNode : nodeHandler) {
-            int nOfFK = graph.getForeignKeyNumberInTable(fromNode.getName());
+        HashMap<String, Integer> map = new HashMap<>();
+        for (NodeObject fromNode : nodeHandler) {
+            int totalExiting = graph.getForeignKeyNumberInTable(fromNode.getName());
             int indexExiting = 1;
+
             for (ForeignKeyColumn foreignKey : graph.getForeignKeysInTable(fromNode.getName())) {
-                NodeObj toNode;
+                NodeObject toNode;
+
                 if ((toNode = getNode(foreignKey.getReferredTable())) != null) {
                     int indexEntering = 1;
                     if (map.get(toNode.getName()) == null) {
                         map.put(toNode.getName(), 1);
-                    }
-                    else {
+                    } else {
                         indexEntering = map.get(toNode.getName()) + 1;
                         map.put(toNode.getName(), indexEntering);
                     }
-                    addArc(new ArcObj(fromNode, toNode, foreignKey.getName(),
-                            foreignKey.getReferredPrimaryKey(), nOfFK, indexExiting,
+                    addArc(new ArcObject(fromNode, toNode,
+                            foreignKey.getName(), foreignKey.getReferredPrimaryKey(),
+                            totalExiting, indexExiting,
                             graph.getEnteringArcNumberInTable(toNode.getName()), indexEntering));
                 }
                 ++indexExiting;
@@ -61,7 +62,7 @@ public class Handler {
     protected void render (Graphics2D g, boolean areWeSaving) {
         //moves nodes coordinates if there was a zoom in/out, resets modifier
         if (Handler.modifier != 1) {
-            for (NodeObj objectNode : nodeHandler) {
+            for (NodeObject objectNode : nodeHandler) {
                 objectNode.setX((int) (objectNode.getX()*modifier));
                 objectNode.setY((int) (objectNode.getY()*modifier));
             }
@@ -73,65 +74,65 @@ public class Handler {
         }
 
         //renders nodes and arcs
-        for (ArcObj objectArc : arcHandler) {
+        for (ArcObject objectArc : arcHandler) {
             objectArc.render(g);
         }
-        for (NodeObj objectNode : nodeHandler) {
+        for (NodeObject objectNode : nodeHandler) {
             objectNode.render(g);
         }
 
         //draws saving frame if in saving mode
-        if (!areWeSaving && ConstantHandler.isSavingMode())
+        if (!areWeSaving && ValueContainer.isSavingMode())
             drawImageConfines(g);
     }
 
     protected void drawImageConfines(Graphics2D g2d) {
-        g2d.setColor(ConstantHandler.getWritingColor());
+        g2d.setColor(ValueContainer.getWritingColor());
 
         //draws a white cross for each savepoint
-        g2d.drawLine(take_from_here.x- anInt-ConstantHandler.getCameraX(),
-                take_from_here.y-ConstantHandler.getCameraY(),
-                take_from_here.x+ anInt-ConstantHandler.getCameraX(),
-                take_from_here.y-ConstantHandler.getCameraY());
-        g2d.drawLine(take_from_here.x-ConstantHandler.getCameraX(),
-                take_from_here.y- anInt-ConstantHandler.getCameraY(),
-                take_from_here.x-ConstantHandler.getCameraX(),
-                take_from_here.y+ anInt-ConstantHandler.getCameraY());
+        g2d.drawLine(take_from_here.x- anInt- ValueContainer.getCameraX(),
+                take_from_here.y- ValueContainer.getCameraY(),
+                take_from_here.x+ anInt- ValueContainer.getCameraX(),
+                take_from_here.y- ValueContainer.getCameraY());
+        g2d.drawLine(take_from_here.x- ValueContainer.getCameraX(),
+                take_from_here.y- anInt- ValueContainer.getCameraY(),
+                take_from_here.x- ValueContainer.getCameraX(),
+                take_from_here.y+ anInt- ValueContainer.getCameraY());
 
-        g2d.drawLine(take_to_here.x- anInt-ConstantHandler.getCameraX(),
-                take_to_here.y-ConstantHandler.getCameraY(),
-                take_to_here.x+ anInt-ConstantHandler.getCameraX(),
-                take_to_here.y-ConstantHandler.getCameraY());
-        g2d.drawLine(take_to_here.x-ConstantHandler.getCameraX(),
-                take_to_here.y- anInt-ConstantHandler.getCameraY(),
-                take_to_here.x-ConstantHandler.getCameraX(),
-                take_to_here.y+ anInt-ConstantHandler.getCameraY());
+        g2d.drawLine(take_to_here.x- anInt- ValueContainer.getCameraX(),
+                take_to_here.y- ValueContainer.getCameraY(),
+                take_to_here.x+ anInt- ValueContainer.getCameraX(),
+                take_to_here.y- ValueContainer.getCameraY());
+        g2d.drawLine(take_to_here.x- ValueContainer.getCameraX(),
+                take_to_here.y- anInt- ValueContainer.getCameraY(),
+                take_to_here.x- ValueContainer.getCameraX(),
+                take_to_here.y+ anInt- ValueContainer.getCameraY());
 
-        //connects the savepoints with a dashed line
+        //connects the save points with a dashed line
         float[] f = {2f, 0f, 2f};
         g2d.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT,BasicStroke.JOIN_ROUND, 1.0f, f, 2f));
-        g2d.drawRect(Math.min(take_from_here.x, take_to_here.x)-ConstantHandler.getCameraX(),
-                Math.min(take_from_here.y, take_to_here.y)-ConstantHandler.getCameraY(),
+        g2d.drawRect(Math.min(take_from_here.x, take_to_here.x)- ValueContainer.getCameraX(),
+                Math.min(take_from_here.y, take_to_here.y)- ValueContainer.getCameraY(),
                 getImageWidth(), getImageHeight());
 
         //draws the circles around the savepoint
-        g2d.setColor(ConstantHandler.getPrimaryColor());
+        g2d.setColor(ValueContainer.getPrimaryColor());
         g2d.setStroke(new BasicStroke(1));
-        g2d.draw(new Ellipse2D.Double(take_from_here.x- anInt-ConstantHandler.getCameraX(),
-                take_from_here.y- anInt-ConstantHandler.getCameraY(), anInt*2, anInt*2));
-        g2d.draw(new Ellipse2D.Double(take_to_here.x- anInt-ConstantHandler.getCameraX(),
-                take_to_here.y- anInt-ConstantHandler.getCameraY(), anInt*2, anInt*2));
-
+        g2d.draw(new Ellipse2D.Double(take_from_here.x- anInt- ValueContainer.getCameraX(),
+                take_from_here.y- anInt- ValueContainer.getCameraY(), anInt*2, anInt*2));
+        g2d.draw(new Ellipse2D.Double(take_to_here.x- anInt- ValueContainer.getCameraX(),
+                take_to_here.y- anInt- ValueContainer.getCameraY(), anInt*2, anInt*2));
     }
 
     protected boolean onSavingStart(Point point) {
-        return new Ellipse2D.Double(take_from_here.x- anInt-ConstantHandler.getCameraX(), take_from_here.y- anInt-ConstantHandler.getCameraY(),
-                anInt*2, anInt*2)
-                .contains(point.x, point.y);
+        return new Ellipse2D.Double(take_from_here.x- anInt- ValueContainer.getCameraX(),
+                take_from_here.y- anInt- ValueContainer.getCameraY(),
+                anInt*2, anInt*2).contains(point.x, point.y);
     }
     protected boolean onSavingEnd(Point point) {
-        return new Ellipse2D.Double(take_to_here.x- anInt-ConstantHandler.getCameraX(), take_to_here.y- anInt-ConstantHandler.getCameraY(), anInt*2, anInt*2)
-                .contains(point.x, point.y);
+        return new Ellipse2D.Double(take_to_here.x- anInt- ValueContainer.getCameraX(),
+                take_to_here.y- anInt- ValueContainer.getCameraY(), anInt*2, anInt*2)
+                                        .contains(point.x, point.y);
     }
 
     protected static int getImageWidth() {
@@ -148,35 +149,34 @@ public class Handler {
         return toReturn;
     }
 
-    protected void addNode(NodeObj object) {
+    protected void addNode(NodeObject object) {
         nodeHandler.add(object);
     }
 
-    protected NodeObj getNode(String name) {
-        for (NodeObj obj : nodeHandler) {
+    protected NodeObject getNode(String name) {
+        for (NodeObject obj : nodeHandler) {
             if (obj.getName().equalsIgnoreCase(name))
                 return obj;
         }
         return null;
     }
 
-    protected void addArc(ArcObj object) {
+    protected void addArc(ArcObject object) {
         arcHandler.add(object);
     }
 
-
-    public NodeObj getNodeInThisCoords(int mX, int mY) {
-        for (NodeObj node : nodeHandler) {
-            if (mX > node.getX()-ConstantHandler.getWidthNode()/ 2 -ConstantHandler.getCameraX() &&
-                    mX < node.getX()+ConstantHandler.getWidthNode()/ 2 -ConstantHandler.getCameraX())
-                if (mY > node.getY()-ConstantHandler.getHeightNode()/ 2 -ConstantHandler.getCameraY() &&
-                        mY < node.getY()+ConstantHandler.getHeightNode()/ 2 -ConstantHandler.getCameraY())
+    protected NodeObject getNodeInThisPoint(int mX, int mY) {
+        for (NodeObject node : nodeHandler) {
+            if (mX > node.getOuterX(false) - ValueContainer.getCameraX() &&
+                    mX < node.getOuterX(true)  - ValueContainer.getCameraX())
+                if (mY > node.getOuterY(false)  - ValueContainer.getCameraY() &&
+                        mY < node.getOuterY(true) - ValueContainer.getCameraY())
                     return node;
         }
         return null;
     }
 
-    public String[] getInfo(String name) {
+    protected String[] getInfo(String name) {
         return graph.getTableInfo(name);
     }
 }
