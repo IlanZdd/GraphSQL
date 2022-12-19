@@ -3,19 +3,9 @@ package Graph.Visualize;
 import Graph.Graph;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.BoxLayout;
-
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -38,12 +28,14 @@ public class Visualize extends JFrame {
         getContentPane().add(canvas).setPreferredSize(new Dimension(ValueContainer.getCanvasWidth(),
                 getHeight()));
         getContentPane().add(panel).setPreferredSize(new Dimension(ValueContainer.getPanelWidth(),
-                ValueContainer.getCanvasHeight()));
+                getHeight()));
         getContentPane().setBackground(ValueContainer.getBackgroundColor());
 
         setPreferredSize(new Dimension(ValueContainer.getCanvasWidth()+ ValueContainer.getPanelWidth(), ValueContainer.getCanvasHeight()));
         setMinimumSize(new Dimension(ValueContainer.getCanvasWidth()+ ValueContainer.getPanelWidth(), ValueContainer.getCanvasHeight()));
-
+/*
+        setUndecorated(true);
+        getRootPane().setWindowDecorationStyle(JRootPane.PLAIN_DIALOG);*/
         MouseAdapter canvasMouseAdapter = new MouseAdapter() {
             private NodeObject clicked = null;
             private Point previous;
@@ -88,7 +80,6 @@ public class Visualize extends JFrame {
                 //we aren't dragging anymore
                 moving = false;
                 clicked = null;
-                panel.printedInfo = null;
                 movingSavingEnd = false;
                 movingSavingStart = false;
             }
@@ -140,26 +131,30 @@ public class Visualize extends JFrame {
                 repaintAll();
             }
         };
-
-        panel.addMouseListener(panelMouseAdapter);
-        canvas.addMouseMotionListener(canvasMouseAdapter);
-        canvas.addMouseListener(canvasMouseAdapter);
         ComponentAdapter thisListener = new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
                 JFrame c = (JFrame) e.getComponent();
-                ValueContainer.setCanvasSize(c.getWidth() - ValueContainer.getPanelWidth(),
+                ValueContainer.setCanvasSize(c.getContentPane().getWidth() - ValueContainer.getPanelWidth(),
                         c.getContentPane().getHeight());
                 setBackground(ValueContainer.getBackgroundColor());
                 panel.setLocation(getWidth() - ValueContainer.getPanelWidth(), 0);
-                panel.setPreferredSize(new Dimension(ValueContainer.getPanelWidth(), getHeight()));
+                panel.setPreferredSize(new Dimension(ValueContainer.getPanelWidth(),
+                        canvas.getHeight()));
+                panel.setMinimumSize(new Dimension(ValueContainer.getPanelWidth(),
+                        canvas.getHeight()));
+                panel.setMinimumSize(new Dimension(ValueContainer.getPanelWidth(),
+                        canvas.getHeight()));
 
                 repaintAll();
             }
         };
-        addComponentListener(thisListener);
 
+        panel.addMouseListener(panelMouseAdapter);
+        canvas.addMouseMotionListener(canvasMouseAdapter);
+        canvas.addMouseListener(canvasMouseAdapter);
+        addComponentListener(thisListener);
         setVisible(true);
     }
 
@@ -200,9 +195,9 @@ public class Visualize extends JFrame {
 
     private void repaintAll() {
         //repaints the canvas and panel
-        panel.removeAll();
-        panel.repaint();
         canvas.removeAll();
         canvas.repaint();
+        panel.removeAll();
+        panel.repaint();
     }
 }

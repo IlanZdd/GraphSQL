@@ -101,10 +101,11 @@ public class Panel extends JPanel {
             textField.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyTyped(KeyEvent e) {
-                    textFieldText = textField.getText();
+                    textFieldText = textField.getText() + e.getKeyChar();
                 }
             });
             textField.setText(textFieldText);
+
             add(textField);
         }
 

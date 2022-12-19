@@ -1,5 +1,5 @@
 # GraphSQL
-GrapghSQL is a java library to create a read-only oriented graph G from an existing database (Supported DBMS: SQLite, MySQL).
+GraphSQL is a java library to create a read-only oriented graph G from an existing database (Supported DBMS: SQLite, MySQL).
 The graph's  nodes are the database's tables, connected between each other with their foreign keys; while the graph is oriented to a read-only use, the number of records in each table can be read, set and records can be added (or subtracted).
 For each column, the graph contain information about their name, datatype and datasize, if values can be null, if they are primary keys and if they are auto-increment;
 Foreign Keys contain the additional information of what table and primary key they are referencing, and the ON_DELETE and ON_UPDATE rule.
@@ -65,7 +65,7 @@ Number of:
 - **addToRecordNumberInTable(String table, int addingNumber) : boolean**: Adds or subtract a number of records to the given table, to a final non-negative value; returns true if table matches a node in the graph, false if there is no match.
 
 
-Foreing key methods:
+Foreign key methods:
 
 - **getForeignKeyNamesInTable(String table) : List<String>** = Returns an immutable list of column names that are foreign key for a given table; returns an empty list if the table does not have any foreign key, or it doesn't exist.
 
