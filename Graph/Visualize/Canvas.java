@@ -5,11 +5,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 public class Canvas extends JPanel {
-    protected final Handler handler;
+    protected final CanvasHandler canvasHandler;
+    protected final ButtonHandler buttonHandler;
 
-    protected Canvas(Handler handler) {
+    protected Canvas(CanvasHandler canvasHandler, ButtonHandler buttonHandler) {
         super();
-        this.handler = handler;
+        this.canvasHandler = canvasHandler;
+        this.buttonHandler = buttonHandler;
     }
 
     @Override
@@ -22,7 +24,8 @@ public class Canvas extends JPanel {
 
     protected void render(Graphics g, boolean areWeSaving) {
         Graphics2D g2d = (Graphics2D) g;
-        handler.render(g2d, areWeSaving);
+        canvasHandler.render(g2d, areWeSaving);
+        buttonHandler.render(g2d);
         g2d.dispose();
     }
 }

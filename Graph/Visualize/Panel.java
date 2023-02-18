@@ -26,7 +26,7 @@ public class Panel extends JPanel {
     private JTextArea info;
     private JScrollPane scrollPane;
     protected String[] printedInfo = null;
-    private static int btnWidth = (ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset()-6)/2;
+    private static int btnWidth = (20-2* 20-6)/2;
     private static final int btnHeight = 27;
 
     protected Panel() {
@@ -38,7 +38,7 @@ public class Panel extends JPanel {
         wellBtn = new Rectangle(0,0, btnWidth, btnHeight);
         externalBtn = new Rectangle(0,0, btnWidth, btnHeight);
 
-        help = new Rectangle(ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset(),
+        help = new Rectangle(20-2* ValueContainer.getPanelOffset(),
                 ValueContainer.getPanelOffset(),
                 ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset());
         changeColor = new Rectangle(ValueContainer.getPanelOffset(),
@@ -56,7 +56,7 @@ public class Panel extends JPanel {
                 ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset());
         savingModeOn.setLocation(ValueContainer.getPanelOffset(),
                 ValueContainer.getCanvasHeight()-4* ValueContainer.getPanelOffset());
-        doSave = new Rectangle(ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset(),
+        doSave = new Rectangle(20-2* ValueContainer.getPanelOffset(),
                 ValueContainer.getCanvasHeight()-4* ValueContainer.getPanelOffset(),
                 ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset());
     }
@@ -65,11 +65,11 @@ public class Panel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         setBackground(ValueContainer.getColorOfPanel());
-        setMaximumSize(new Dimension(ValueContainer.getPanelWidth(),
+        setMaximumSize(new Dimension(20,
                 ValueContainer.getCanvasHeight()));
-        setMinimumSize(new Dimension(ValueContainer.getPanelWidth(),
+        setMinimumSize(new Dimension(20,
                 ValueContainer.getCanvasHeight()));
-        setPreferredSize(new Dimension(ValueContainer.getPanelWidth(),
+        setPreferredSize(new Dimension(20,
                 ValueContainer.getCanvasHeight()));
 
         if (this.getComponentCount() == 0 || scrollPane == null ||
@@ -126,7 +126,7 @@ public class Panel extends JPanel {
                 ValueContainer.getCanvasHeight()-2* ValueContainer.getPanelOffset());
         zoomIn.setLocation(5* ValueContainer.getPanelOffset(),
                 ValueContainer.getCanvasHeight()-2* ValueContainer.getPanelOffset());
-        help.setLocation(ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset(),
+        help.setLocation(20-2* ValueContainer.getPanelOffset(),
                 ValueContainer.getPanelOffset());
 
         // draws the util Buttons
@@ -159,22 +159,22 @@ public class Panel extends JPanel {
                     help.y+help.height-fm.getAscent()/2);
 
             //write the graph name and number of table
-            String graphName = Handler.graph.getName();
+            String graphName = CanvasHandler.graph.getName();
             graphName = graphName.substring(
                     ((graphName.lastIndexOf('/') != -1) ? graphName.lastIndexOf('/')+1 :
                             ((graphName.lastIndexOf('\\') != -1) ? graphName.lastIndexOf('\\')+1 : 0)));
             graphName = graphName.substring(0,
                     (graphName.indexOf('.') != -1) ? graphName.indexOf('.') : graphName.length());
-            g2d.drawString(graphName.toUpperCase() + " :: " + Handler.graph.getTableNumber() + " tables",
+            g2d.drawString(graphName.toUpperCase() + " :: " + CanvasHandler.graph.getTableNumber() + " tables",
                     ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset()+fm.getHeight());
 
             //draw the buttons
             int atThisPointY = fm.getHeight()+2* ValueContainer.getPanelOffset();
             Rectangle container = new Rectangle(ValueContainer.getPanelOffset(), atThisPointY,
-                    ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset(), 60);
+                    20-2* ValueContainer.getPanelOffset(), 60);
             g2d.draw(container);
 
-            btnWidth = (ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset()-6)/2;
+            btnWidth = (20-2* ValueContainer.getPanelOffset()-6)/2;
 
             sourceBtn.setSize(btnWidth, btnHeight);
             midBtn.width = btnWidth;
@@ -229,7 +229,7 @@ public class Panel extends JPanel {
                     ValueContainer.getCanvasHeight()-4* ValueContainer.getPanelOffset(),
                     doSave.x-(savingModeOn.x+savingModeOn.width+8), ValueContainer.getPanelOffset());
             if (ValueContainer.isSavingMode()){
-                doSave.setLocation(ValueContainer.getPanelWidth()-2* ValueContainer.getPanelOffset(),
+                doSave.setLocation(20-2* ValueContainer.getPanelOffset(),
                         ValueContainer.getCanvasHeight()-4* ValueContainer.getPanelOffset());
                 g2d.draw(doSave);
                 g2d.drawString("V", doSave.x+doSave.width/2-fm.stringWidth("V")/2, doSave.y+doSave.height-fm.getAscent()/2);
@@ -265,7 +265,7 @@ public class Panel extends JPanel {
     private void renderInfo(int atThisPointY, String[] toPrint) {
         info.setText(null);
         scrollPane.setBounds(new Rectangle(ValueContainer.getPanelOffset(), atThisPointY,
-                ValueContainer.getPanelWidth() - 2 * ValueContainer.getPanelOffset(),
+                20 - 2 * ValueContainer.getPanelOffset(),
                 ValueContainer.getCanvasHeight() - atThisPointY - 5* ValueContainer.getPanelOffset()));
         scrollPane.setBackground(ValueContainer.getColorOfInfoPanel());
         info.setBounds(0,0, scrollPane.getWidth()-scrollPane.getVerticalScrollBar().getWidth(), scrollPane.getHeight());
@@ -286,27 +286,27 @@ public class Panel extends JPanel {
 
             info.append("\n ");
             int indexAtThisPoint = 3;
-            if (Handler.graph.getPrimaryKeyNumberInTable(printedInfo[0]) > 0) {
+            if (CanvasHandler.graph.getPrimaryKeyNumberInTable(printedInfo[0]) > 0) {
                 info.append("\nPrimary Keys: ");
-                for (int i = indexAtThisPoint; i < indexAtThisPoint + Handler.graph.getPrimaryKeyNumberInTable(printedInfo[0]); ++i) {
+                for (int i = indexAtThisPoint; i < indexAtThisPoint + CanvasHandler.graph.getPrimaryKeyNumberInTable(printedInfo[0]); ++i) {
                     info.append("\n- " + printedInfo[i]);
                 }
 
-                indexAtThisPoint += Handler.graph.getPrimaryKeyNumberInTable(printedInfo[0]);
+                indexAtThisPoint += CanvasHandler.graph.getPrimaryKeyNumberInTable(printedInfo[0]);
             }
 
             info.append("\n");
-            if (Handler.graph.getForeignKeyNumberInTable(printedInfo[0]) > 0) {
+            if (CanvasHandler.graph.getForeignKeyNumberInTable(printedInfo[0]) > 0) {
                 info.append("\nForeign Keys: ");
-                for (int i = indexAtThisPoint; i < indexAtThisPoint + Handler.graph.getForeignKeyNumberInTable(printedInfo[0]); ++i) {
+                for (int i = indexAtThisPoint; i < indexAtThisPoint + CanvasHandler.graph.getForeignKeyNumberInTable(printedInfo[0]); ++i) {
                     info.append("\n- " + printedInfo[i].replace("->", " -> "));
                 }
-                indexAtThisPoint += Handler.graph.getForeignKeyNumberInTable(printedInfo[0]);
+                indexAtThisPoint += CanvasHandler.graph.getForeignKeyNumberInTable(printedInfo[0]);
             }
 
-            int nOfPlainColumns = Handler.graph.getColumnNumberInTable(printedInfo[0]) -
-                    Handler.graph.getForeignKeyNumberInTable(printedInfo[0]) -
-                    Handler.graph.getPrimaryKeyNumberInTable(printedInfo[0]);
+            int nOfPlainColumns = CanvasHandler.graph.getColumnNumberInTable(printedInfo[0]) -
+                    CanvasHandler.graph.getForeignKeyNumberInTable(printedInfo[0]) -
+                    CanvasHandler.graph.getPrimaryKeyNumberInTable(printedInfo[0]);
 
             info.append("\n");
             if (nOfPlainColumns > 0) {
@@ -317,8 +317,8 @@ public class Panel extends JPanel {
             }
 
             info.append("\n");
-            if (Handler.graph.hasProblematicArcs(printedInfo[0])) {
-                for (ForeignKeyColumn fk : Handler.graph.listProblematicArcs().get(printedInfo[0])) {
+            if (CanvasHandler.graph.hasProblematicArcs(printedInfo[0])) {
+                for (ForeignKeyColumn fk : CanvasHandler.graph.listProblematicArcs().get(printedInfo[0])) {
                     info.append("\n !Has cycle with " + fk.getReferredTable());
                 }
             }

@@ -3,8 +3,8 @@ import Utils.DBConnection;
 
 public class Main {
     public static void main (String[] args) throws Exception {
-        DBConnection.setConn("sqlite", "", "", "", "/home/ilan/Downloads/data");
-        Graph g = new Graph("sqlite", DBConnection.getConn(), "/home/ilan/Downloads/data");/*
+        DBConnection.setConn("mysql", "localhost:3306", "root", "Password_123", "pokemon_db");
+        Graph g = new Graph("mysql", DBConnection.getConn(), "pokemon_db");/*
         Graph g1 = new Graph("sqlite", "", "", "", "/home/ilan/Downloads/pokemon_db.db");
 
         System.out.println("\t" + "graph name : " + g.getName());

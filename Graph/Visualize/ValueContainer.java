@@ -7,7 +7,7 @@ import java.awt.Point;
 import java.awt.Font;
 import java.util.ArrayList;
 
-import static Graph.Visualize.Handler.graph;
+import static Graph.Visualize.CanvasHandler.graph;
 
 public class ValueContainer {
     //COLORI
@@ -38,9 +38,6 @@ public class ValueContainer {
     //DIMENSIONI CANVAS
     private static int canvasWidth = 640;
     private static int canvasHeight = 640/12*9;
-
-    //PANEL
-    private static final int panelWidth = 640/3;
     private static final int panelOffset = 20;
 
     //SELECTION
@@ -150,7 +147,6 @@ public class ValueContainer {
     }
 
     /*- PANEL DIMENSION -*/
-    protected static int getPanelWidth() { return panelWidth; }
     protected static Font getPanelFont() { return panelFont; }
     protected static int getPanelOffset() { return panelOffset; }
 
@@ -186,14 +182,14 @@ public class ValueContainer {
         if (zoomStatus>0){
             zoomStatus--;
             updateZoomValues();
-            Handler.modifier = 0.8;
+            CanvasHandler.modifier = 0.8;
         }
     }
     protected static void zoomIn() {
         if (zoomStatus<fontSize.length-1){
             zoomStatus++;
             updateZoomValues();
-            Handler.modifier = 1.3;
+            CanvasHandler.modifier = 1.3;
         }
     }
     private static void updateZoomValues(){
