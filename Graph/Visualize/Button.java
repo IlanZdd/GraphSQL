@@ -1,6 +1,7 @@
 package Graph.Visualize;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
 public class Button {
     private Point TLpoint;
@@ -22,17 +23,26 @@ public class Button {
     }
 
     protected void paint (Graphics2D g2d) {
-        g2d.setColor(ValueContainer.getWritingColor());
+        g2d.setColor(ValueContainer.getBackgroundColor());
         g2d.setFont(ValueContainer.getPanelFont());
         FontMetrics fm = g2d.getFontMetrics();
 
-        if (isSquare)
+        if (isSquare) {
+            g2d.fillRect(TLpoint.x, TLpoint.y, width, height);
+            g2d.setColor(ValueContainer.getWritingColor());
             g2d.drawRect(TLpoint.x, TLpoint.y, width, height);
-        else
+        }
+        else {
+            g2d.fillOval(TLpoint.x, TLpoint.y, width, height);
+            g2d.setColor(ValueContainer.getWritingColor());
             g2d.drawOval(TLpoint.x, TLpoint.y, width, height);
+        }
 
-        g2d.drawString(label, TLpoint.x + width/2 - fm.stringWidth(label)/2,
+        if (!label.equalsIgnoreCase("colour"))
+            g2d.drawString(label, TLpoint.x + width/2 - fm.stringWidth(label)/2,
                 TLpoint.y + height - fm.getAscent()/2);
+        else g2d.fillPolygon(new int[]{TLpoint.x, getBLpoint().x, getBRpoint().x},
+                new int[]{TLpoint.y, getBLpoint().y, getBRpoint().y}, 3);
     }
 
     public Point getTLpoint() { return TLpoint; }
@@ -49,4 +59,16 @@ public class Button {
 
     public int getWidth() { return width; }
     public int getHeight() { return height; }
+
+    public String getLabel() {        return label;    }
+
+    public short contains (Point point) {
+        if (isSquare)
+            if (new Rectangle(getTLpoint().x, getTLpoint().y, width, height).contains(point))
+                return 1;
+        else
+            if (new Ellipse2D.Float(getTLpoint().x, getTLpoint().y, width, height).contains(point))
+                return 1;
+        return 0;
+    }
 }

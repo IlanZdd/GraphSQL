@@ -1,6 +1,7 @@
 package Graph.Visualize;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
 public class ZoomButtons extends Button{
     public ZoomButtons(Point TLpoint, int width, int height) {
@@ -32,5 +33,18 @@ public class ZoomButtons extends Button{
                 getTLpoint().y + getHeight() - fm.getAscent()/2);
         g2d.drawString("-", getTLpoint().x-ValueContainer.getPanelOffset()*3/2 + getWidth() /2 - fm.stringWidth("-")/2,
                 getTLpoint().y + getHeight() - fm.getAscent()/2);
+    }
+
+    @Override
+    public short contains(Point point) {
+        if (new Ellipse2D.Float(getTLpoint().x, getTLpoint().y, getWidth(), getHeight()).contains(point)) {
+            ValueContainer.zoomIn();
+            return 1;
+        } else if (new Ellipse2D.Float(getTLpoint().x-ValueContainer.getPanelOffset()*3/2f, getTLpoint().y,
+                getWidth(), getHeight()).contains(point)) {
+            ValueContainer.zoomOut();
+            return 1;
+        }
+        return 0;
     }
 }

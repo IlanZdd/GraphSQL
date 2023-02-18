@@ -5,6 +5,10 @@ import Graph.Graph;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +20,7 @@ public class Visualize extends JFrame {
     private boolean moving = false;
 
     public Visualize(Graph graph) {
-        setTitle(graph.getName());
+        setTitle(graph.getName().toUpperCase() + " :: " + graph.getTableNumber() + " tables");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
@@ -31,6 +35,97 @@ public class Visualize extends JFrame {
         canvas = new Canvas(canvasHandler, buttonHandler);
         getContentPane().add(canvas).setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
         getContentPane().setBackground(ValueContainer.getBackgroundColor());
+
+        MouseAdapter canvasMouseAdapter = new MouseAdapter() {
+            private NodeObject clicked = null;
+            private Point previous;
+            private boolean movingSavingStart;
+            private boolean movingSavingEnd;
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // If a node is clicked, it will be highlighted, along with its arcs and tree
+                short clickedButton = buttonHandler.clickedButton(e.getPoint());
+                if (clickedButton == 0) {
+                    if ((clicked = canvasHandler.getNodeInThisPoint(e.getX(), e.getY())) != null) {
+                        ValueContainer.setSelectedNode(clicked.getName());
+                    } else {
+                        // else, the selections are cleaned
+                        ValueContainer.cleanSelection();
+                    }
+                } else if (clickedButton == 2)
+                    createImage();
+                repaintAll();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                //start of moving a node, saving point or camera
+                super.mousePressed(e);
+                if ((clicked = canvasHandler.getNodeInThisPoint(e.getX(), e.getY())) != null) {
+                    //if a node is pressed, it's the start of dragging a node, and it will become selected
+                    ValueContainer.setSelectedNode(clicked.getName());
+                    repaintAll();
+
+                } else if (canvasHandler.onSavingStart(e.getPoint()) && ValueContainer.isSavingMode()) {
+                    movingSavingStart = true;
+                } else if (canvasHandler.onSavingEnd(e.getPoint()) && ValueContainer.isSavingMode()) {
+                    movingSavingEnd = true;
+                }
+                moving = true;
+                previous = e.getPoint();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                //we aren't dragging anymore
+                moving = false;
+                clicked = null;
+                movingSavingEnd = false;
+                movingSavingStart = false;
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (moving) {
+                    if (clicked != null) { //moving a node
+                        clicked.setX(e.getX() + ValueContainer.getCameraX());
+                        clicked.setY(e.getY() + ValueContainer.getCameraY());
+
+                    } else if (movingSavingStart) { //moving a saving point
+                        canvasHandler.take_from_here.x = e.getX() + ValueContainer.getCameraX();
+                        canvasHandler.take_from_here.y = e.getY() + ValueContainer.getCameraY();
+                    } else if (movingSavingEnd) {
+                        canvasHandler.take_to_here.x = e.getX() + ValueContainer.getCameraX();
+                        canvasHandler.take_to_here.y = e.getY() + ValueContainer.getCameraY();
+
+                    } else {//moving the camera
+                        ValueContainer.setCameraX((int) (ValueContainer.getCameraX() + (previous.getX() - e.getX())));
+                        ValueContainer.setCameraY((int) (ValueContainer.getCameraY() + (previous.getY() - e.getY())));
+                        previous = e.getPoint();
+                    }
+
+                    canvas.removeAll();
+                    canvas.repaint();
+                }
+            }
+        };
+        ComponentAdapter thisListener = new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                JFrame c = (JFrame) e.getComponent();
+                ValueContainer.setCanvasSize(c.getContentPane().getWidth(),
+                        c.getContentPane().getHeight());
+                setBackground(ValueContainer.getBackgroundColor());
+                buttonHandler.updateButtonsWhenResized();
+                repaintAll();
+            }
+        };
+
+        canvas.addMouseMotionListener(canvasMouseAdapter);
+        canvas.addMouseListener(canvasMouseAdapter);
+        addComponentListener(thisListener);
 
         setVisible(true);
     }

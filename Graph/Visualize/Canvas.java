@@ -25,7 +25,8 @@ public class Canvas extends JPanel {
     protected void render(Graphics g, boolean areWeSaving) {
         Graphics2D g2d = (Graphics2D) g;
         canvasHandler.render(g2d, areWeSaving);
-        buttonHandler.render(g2d);
+        if (!areWeSaving)
+            buttonHandler.render(g2d);
         g2d.dispose();
     }
 }
