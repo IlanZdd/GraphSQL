@@ -31,6 +31,7 @@ public class ValueContainer {
     private static Font font = new Font("Dialog", Font.PLAIN, 12);
     private static final Font panelFont = new Font("Dialog", Font.PLAIN, 12);
 
+    private static String savingName = null;
     //DIMENSIONI NODI
     private static int nodeMaxLength = 0;
     private static int nodeWidth = 0;
@@ -256,4 +257,11 @@ public class ValueContainer {
         nodeOffset = nodeWidth / 4;
     }
 
+    public static String getSavingName() {
+        return savingName;
+    }
+
+    public static void setSavingName(String savingName) {
+        ValueContainer.savingName = savingName;
+    }
 }

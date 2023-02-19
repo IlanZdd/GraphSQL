@@ -2,6 +2,7 @@ package Graph.Visualize;
 
 import Graph.Graph;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,10 +36,16 @@ public class ButtonHandler {
                 ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset()));
 
         //colour
-        buttons.add(new Button(
+        /*buttons.add(new Button(
                 new Point(ValueContainer.getCanvasWidth()-ValueContainer.getPanelOffset()*3/2, ValueContainer.getPanelOffset()/2),
                 ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset(), "colour",
-                true, false, true));
+                true, false, true));*/
+
+        //colour2
+        buttons.add(new Button(
+                new Point(ValueContainer.getPanelOffset()/2, ValueContainer.getCanvasHeight()-ValueContainer.getPanelOffset()*7/2),
+                ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset(), "colour",
+                true, true, false));
 
     }
 
@@ -47,7 +54,10 @@ public class ButtonHandler {
             if (!button.isOnTheLeft())
                 button.setTLpointX(ValueContainer.getCanvasWidth()-ValueContainer.getPanelOffset()*2);
             if (!button.isOnTheTop()) {
-                button.setTLpointY(ValueContainer.getCanvasHeight() - ValueContainer.getPanelOffset() * 2);
+                if (button.getLabel().equalsIgnoreCase("colour"))
+                    button.setTLpointY(ValueContainer.getCanvasHeight()-ValueContainer.getPanelOffset()*7/2);
+                else
+                    button.setTLpointY(ValueContainer.getCanvasHeight() - ValueContainer.getPanelOffset() * 2);
             }
         }
     }
@@ -116,5 +126,12 @@ public class ButtonHandler {
             return 1;
         }
         return 0;
+    }
+
+    protected void addTextfield(JTextField textField) {
+        for (Button button: buttons) {
+            if (button instanceof FloppyButton)
+                ((FloppyButton) button).addTextfield(textField);
+        }
     }
 }

@@ -5,10 +5,7 @@ import Graph.Graph;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +19,7 @@ public class Visualize extends JFrame {
     public Visualize(Graph graph) {
         setTitle(graph.getName().toUpperCase() + " :: " + graph.getTableNumber() + " tables");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
+        setLayout(new GridLayout(1,0));
 
         setPreferredSize(new Dimension(ValueContainer.getCanvasWidth(),
                 ValueContainer.getCanvasHeight()));
@@ -159,7 +156,10 @@ public class Visualize extends JFrame {
 
         //  The image is saved with textField.png or graphName.png
         try {
-            File saving = new File("image" + ".png");
+            File saving;
+            if (ValueContainer.getSavingName().isEmpty())
+                saving = new File("image" + ".png");
+            else saving= new File(ValueContainer.getSavingName() + ".png");
             ImageIO.write(image, "png", saving);
             System.out.println("Image saved at " + saving.getAbsolutePath());
         } catch (IOException e) { throw new RuntimeException(e); }
