@@ -2,9 +2,7 @@ package Graph.Visualize;
 
 import Graph.Graph;
 
-import java.awt.Color;
-import java.awt.Point;
-import java.awt.Font;
+import java.awt.*;
 import java.util.ArrayList;
 
 import static Graph.Visualize.CanvasHandler.graph;
@@ -24,6 +22,10 @@ public class ValueContainer {
     private static final int[] fontSize = {7, 9, 12, 14, 16, 18};
     private static final int[] textToWidthModifier = {4, 6, 8, 9, 11, 13};
     private static boolean savingMode = false;
+
+    private static String selectedButton = "";
+
+    private static String hoveredButton = "";
 
     //FONT
     private static Font font = new Font("Dialog", Font.PLAIN, 12);
@@ -100,6 +102,38 @@ public class ValueContainer {
             return new Color(231, 236, 241);
         }
     }
+    protected static Color getBackgroundColorOfButton(String name) {
+        if (darkTheme) {
+            if ((name.equalsIgnoreCase("save"))) {
+                if (savingMode && hoveredButton.equalsIgnoreCase("save"))
+                    return getPrimaryColor().darker();
+                if (savingMode)
+                    return getPrimaryColor().darker().darker().darker();
+            } else {
+                if (selectedButton.equalsIgnoreCase(name) && hoveredButton.equalsIgnoreCase(name))
+                    return getPrimaryColor().darker();
+                if (selectedButton.equalsIgnoreCase(name))
+                    return getPrimaryColor().darker().darker().darker();
+            }
+            if (hoveredButton.equalsIgnoreCase(name))
+                return getSecondaryColor().darker().darker().darker();
+        } else {
+            if ((name.equalsIgnoreCase("save"))) {
+                if (savingMode && hoveredButton.equalsIgnoreCase("save"))
+                    return getPrimaryColor().brighter().brighter().brighter();
+                if (savingMode)
+                    return new Color(189, 236, 238);
+            } else {
+                if (selectedButton.equalsIgnoreCase(name) && hoveredButton.equalsIgnoreCase(name))
+                    return getPrimaryColor().brighter();
+                if (selectedButton.equalsIgnoreCase(name))
+                    return new Color(189, 236, 238);
+            }
+            if (hoveredButton.equalsIgnoreCase(name))
+                return getSecondaryColor().brighter().brighter().brighter();
+        }
+        return getBackgroundColor();
+    }
     protected static Color getColorOfPanel() {
         if (darkTheme)
             return backgroundColor.brighter();
@@ -152,17 +186,38 @@ public class ValueContainer {
 
     /*- SAVING MODE -*/
     protected static boolean isSavingMode() { return savingMode; }
-    protected static void setSavingMode() { savingMode = !savingMode; }
+    protected static void setSavingMode() {
+        savingMode = !savingMode;
+        if (!savingMode && selectedButton.equalsIgnoreCase("save"))
+            selectedButton = "";
+    }
 
     /*- SELECTIONS -*/
     protected static void cleanSelection() {
         ValueContainer.selectedType = Graph.nodeType.unknown;
         ValueContainer.selectedNode = "";
         ValueContainer.selectedTree.clear();
+        ValueContainer.selectedButton = "";
+    }
+    protected static void setClickedButton (String button) {
+        ValueContainer.selectedButton = button;
+        ValueContainer.hoveredButton = button;
+    }
+    protected static void setHoveredButton (String button) {
+        ValueContainer.hoveredButton = button;
+    }
+
+    protected static boolean isButtonHovered() {
+        return !hoveredButton.equals("");
     }
     protected static Graph.nodeType getSelectedType() { return selectedType; }
-    protected static void setSelectedType(Graph.nodeType selectedType) {
+    protected static void setSelectedType(Graph.nodeType selectedType, String button) {
+        if (selectedType.equals(ValueContainer.getSelectedType())) {
+            ValueContainer.cleanSelection();
+            return;
+        }
         ValueContainer.cleanSelection();
+        ValueContainer.selectedButton = button;
         ValueContainer.selectedType = selectedType;
     }
     protected static void setSelectedNode(String selectedNode) {
@@ -184,6 +239,7 @@ public class ValueContainer {
             updateZoomValues();
             CanvasHandler.modifier = 0.8;
         }
+        ValueContainer.setClickedButton("");
     }
     protected static void zoomIn() {
         if (zoomStatus<fontSize.length-1){
@@ -191,6 +247,7 @@ public class ValueContainer {
             updateZoomValues();
             CanvasHandler.modifier = 1.3;
         }
+        ValueContainer.setClickedButton("");
     }
     private static void updateZoomValues(){
         font = new Font(font.getName(), font.getStyle(), fontSize[zoomStatus]);

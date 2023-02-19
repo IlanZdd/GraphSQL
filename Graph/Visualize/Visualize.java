@@ -43,6 +43,14 @@ public class Visualize extends JFrame {
             private boolean movingSavingEnd;
 
             @Override
+            public void mouseMoved(MouseEvent e) {
+                if (!moving) {
+                    if (buttonHandler.hoverOnButton(e.getPoint()) == 1)
+                        canvas.repaint();
+                }
+            }
+
+            @Override
             public void mouseClicked(MouseEvent e) {
                 // If a node is clicked, it will be highlighted, along with its arcs and tree
                 short clickedButton = buttonHandler.clickedButton(e.getPoint());
@@ -158,6 +166,7 @@ public class Visualize extends JFrame {
 
         //  Everything is reset
         ValueContainer.setCamera(camera);
+        ValueContainer.setClickedButton("");
         repaintAll();
         g2d.dispose();
     }

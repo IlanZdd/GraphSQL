@@ -21,8 +21,9 @@ public class ZoomButtons extends Button{
                 getBLpoint().x-ValueContainer.getPanelOffset()*3/2, getBLpoint().y);
 
         g2d.setStroke(new BasicStroke(1));
-        g2d.setColor(ValueContainer.getBackgroundColor());
+        g2d.setColor(ValueContainer.getBackgroundColorOfButton("zoomIn"));
         g2d.fillOval(getTLpoint().x, getTLpoint().y, getWidth(), getHeight());
+        g2d.setColor(ValueContainer.getBackgroundColorOfButton("zoomOut"));
         g2d.fillOval(getTLpoint().x-ValueContainer.getPanelOffset()*3/2, getTLpoint().y, getWidth(), getHeight());
 
         g2d.setColor(ValueContainer.getWritingColor());
@@ -38,12 +39,10 @@ public class ZoomButtons extends Button{
     @Override
     public short contains(Point point) {
         if (new Ellipse2D.Float(getTLpoint().x, getTLpoint().y, getWidth(), getHeight()).contains(point)) {
-            ValueContainer.zoomIn();
-            return 1;
+            return 3; //zoom in
         } else if (new Ellipse2D.Float(getTLpoint().x-ValueContainer.getPanelOffset()*3/2f, getTLpoint().y,
                 getWidth(), getHeight()).contains(point)) {
-            ValueContainer.zoomOut();
-            return 1;
+            return 4; //zoom out
         }
         return 0;
     }

@@ -12,7 +12,7 @@ public class FloppyButton extends Button {
 
     @Override
     protected void paint (Graphics2D g2d) {
-        g2d.setColor(ValueContainer.getBackgroundColor());
+        g2d.setColor(ValueContainer.getBackgroundColorOfButton(getLabel()));
         g2d.fillRect(getTLpoint().x, getTLpoint().y, getWidth(), getHeight());
 
         g2d.setColor(ValueContainer.getWritingColor());
@@ -29,7 +29,7 @@ public class FloppyButton extends Button {
 
         if (ValueContainer.isSavingMode()) {
             FontMetrics fm = g2d.getFontMetrics(ValueContainer.getFont());
-            g2d.setColor(ValueContainer.getBackgroundColor());
+            g2d.setColor(ValueContainer.getBackgroundColorOfButton("confirmSave"));
             g2d.fillOval(getTLpoint().x+ValueContainer.getPanelOffset()*9/2, getTLpoint().y,
                     getWidth(), getHeight());
 
@@ -44,13 +44,12 @@ public class FloppyButton extends Button {
     @Override
     public short contains(Point point) {
         if (super.contains(point) == 1) {
-            ValueContainer.setSavingMode();
-            return 1;
+            return 1; //turn on/off saving mode
         }
         if (ValueContainer.isSavingMode() &&
             new Ellipse2D.Float(getTLpoint().x+ValueContainer.getPanelOffset()*9/2f, getTLpoint().y,
                     getWidth(), getHeight()).contains(point))
-            return 2;
+            return 2; //save image
         return 0;
     }
 }

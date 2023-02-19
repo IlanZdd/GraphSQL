@@ -64,16 +64,56 @@ public class ButtonHandler {
             switch (button.contains(mouse)) {
                 case 1 -> {
                     switch (button.getLabel().toLowerCase()) {
-                        case "external" -> ValueContainer.setSelectedType(Graph.nodeType.external_node);
-                        case "mid-node" -> ValueContainer.setSelectedType(Graph.nodeType.mid_node);
-                        case "source" -> ValueContainer.setSelectedType(Graph.nodeType.source);
-                        case "well" -> ValueContainer.setSelectedType(Graph.nodeType.well);
+                        case "external" -> ValueContainer.setSelectedType(Graph.nodeType.external_node, "external");
+                        case "mid-node" -> ValueContainer.setSelectedType(Graph.nodeType.mid_node, "mid-node");
+                        case "source" -> ValueContainer.setSelectedType(Graph.nodeType.source, "source");
+                        case "well" -> ValueContainer.setSelectedType(Graph.nodeType.well, "well");
                         case "colour" -> ValueContainer.changeTheme();
+                        case "save" -> ValueContainer.setSavingMode();
                     }
                     return 1;
                 }
-                case 2 -> { return 2; }
+                case 2 -> {
+                    ValueContainer.setClickedButton("confirmSave");
+                    return 2; }
+                case 3 -> {
+                    ValueContainer.setClickedButton("zoomIn");
+                    ValueContainer.zoomIn();
+                    return 1;
+                }
+                case 4 -> {
+                    ValueContainer.setClickedButton("zoomOut");
+                    ValueContainer.zoomOut();
+                    return 1;
+                }
             }
+        }
+        return 0;
+    }
+    protected short hoverOnButton(Point mouse){
+        for (Button button : buttons) {
+            switch (button.contains(mouse)) {
+                case 1 -> {
+                    ValueContainer.setHoveredButton(button.getLabel());
+                    return 1;
+                }
+                case 2 -> {
+                    ValueContainer.setHoveredButton("confirmSave");
+                    return 1;
+                }
+                case 3 -> {
+                    ValueContainer.setHoveredButton("zoomIn");
+                    return 1;
+                }
+                case 4 -> {
+                    ValueContainer.setHoveredButton("zoomOut");
+                return 1;
+                }
+            }
+        }
+        if (ValueContainer.isButtonHovered()) {
+            ValueContainer.setHoveredButton("");
+            return 1;
         }
         return 0;
     }

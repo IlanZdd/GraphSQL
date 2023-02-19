@@ -23,7 +23,7 @@ public class Button {
     }
 
     protected void paint (Graphics2D g2d) {
-        g2d.setColor(ValueContainer.getBackgroundColor());
+        g2d.setColor(ValueContainer.getBackgroundColorOfButton(label));
         g2d.setFont(ValueContainer.getPanelFont());
         FontMetrics fm = g2d.getFontMetrics();
 
