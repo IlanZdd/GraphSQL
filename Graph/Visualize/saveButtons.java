@@ -4,9 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
-public class FloppyButton extends Button {
+public class saveButtons extends Button {
     private JTextField textField;
-    public FloppyButton(Point TLpoint, int width, int height) {
+    public saveButtons(Point TLpoint, int width, int height) {
         super(TLpoint, width, height, "save", true, true, false);
     }
 
@@ -37,6 +37,9 @@ public class FloppyButton extends Button {
 
         if (ValueContainer.isSavingMode()) {
             FontMetrics fm = g2d.getFontMetrics(ValueContainer.getFont());
+            g2d.drawLine(textField.getX(), textField.getY()+ textField.getHeight(),
+                    textField.getX() + textField.getWidth(), textField.getY()+ textField.getHeight());
+
             g2d.setColor(ValueContainer.getBackgroundColorOfButton("confirmSave"));
             g2d.fillOval(getTLpoint().x+ValueContainer.getPanelOffset()*9/2, getTLpoint().y,
                     getWidth(), getHeight());

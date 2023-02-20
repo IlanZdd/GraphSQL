@@ -16,6 +16,8 @@ public class CanvasHandler {
     protected LinkedList<NodeObject> nodeHandler = new LinkedList<>();
     protected LinkedList<ArcObject> arcHandler = new LinkedList<>();
     protected int anInt = 4;
+    protected TableInfo infoPanel;
+    protected boolean shouldDrawPanel;
 
     protected CanvasHandler(Graph graph) {
         CanvasHandler.graph = graph;
@@ -78,6 +80,8 @@ public class CanvasHandler {
             objectArc.render(g);
         }
         for (NodeObject objectNode : nodeHandler) {
+            if (objectNode.getName().equalsIgnoreCase(ValueContainer.getSelectedNode()))
+                infoPanel.setNode(objectNode);
             objectNode.render(g);
         }
 
@@ -176,7 +180,13 @@ public class CanvasHandler {
         return null;
     }
 
-    protected String[] getInfo(String name) {
-        return graph.getTableInfo(name);
+    protected void addInfoPanel(TableInfo tableInfo) {
+        infoPanel = tableInfo;
     }
+    protected void updatePanelX() {
+        if (infoPanel != null) {
+            infoPanel.updateX();
+        }
+    }
+
 }

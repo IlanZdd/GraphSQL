@@ -24,7 +24,7 @@ public class ButtonHandler {
         }
 
         //save
-        buttons.add(new FloppyButton(
+        buttons.add(new saveButtons(
                 new Point(ValueContainer.getPanelOffset()/2,
                         ValueContainer.getCanvasHeight()-ValueContainer.getPanelOffset()*2),
                 ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset()));
@@ -130,8 +130,8 @@ public class ButtonHandler {
 
     protected void addTextfield(JTextField textField) {
         for (Button button: buttons) {
-            if (button instanceof FloppyButton)
-                ((FloppyButton) button).addTextfield(textField);
+            if (button instanceof saveButtons)
+                ((saveButtons) button).addTextfield(textField);
         }
     }
 }

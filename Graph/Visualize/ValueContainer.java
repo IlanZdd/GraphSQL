@@ -226,6 +226,15 @@ public class ValueContainer {
         ValueContainer.selectedNode = selectedNode;
         selectedTree.addAll(graph.getTreeByTable(selectedNode));
     }
+    protected static boolean isSelectedNode() {
+        return !selectedNode.isEmpty();
+    }
+    protected static String getSelectedNode() {
+        return selectedNode;
+    }
+    protected static String[] getTableInfo(String name) {
+        return graph.getTableInfo(name);
+    }
 
     /*- CAMERA -*/
     protected static int getCameraX() { return camera.x; }

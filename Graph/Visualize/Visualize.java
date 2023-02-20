@@ -71,12 +71,12 @@ public class Visualize extends JFrame {
                     //if a node is pressed, it's the start of dragging a node, and it will become selected
                     ValueContainer.setSelectedNode(clicked.getName());
                     repaintAll();
-
                 } else if (canvasHandler.onSavingStart(e.getPoint()) && ValueContainer.isSavingMode()) {
                     movingSavingStart = true;
                 } else if (canvasHandler.onSavingEnd(e.getPoint()) && ValueContainer.isSavingMode()) {
                     movingSavingEnd = true;
                 }
+                canvasHandler.shouldDrawPanel = false;
                 moving = true;
                 previous = e.getPoint();
             }
@@ -88,6 +88,8 @@ public class Visualize extends JFrame {
                 clicked = null;
                 movingSavingEnd = false;
                 movingSavingStart = false;
+                canvasHandler.shouldDrawPanel = true;
+                if (canvasHandler.infoPanel != null) repaintAll();
             }
 
             @Override
@@ -124,6 +126,7 @@ public class Visualize extends JFrame {
                         c.getContentPane().getHeight());
                 setBackground(ValueContainer.getBackgroundColor());
                 buttonHandler.updateButtonsWhenResized();
+                canvasHandler.updatePanelX();
                 repaintAll();
             }
         };

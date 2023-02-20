@@ -72,5 +72,7 @@ public class NodeObject {
         // Writes the name
         g2d.drawString(name, x - (float)fm.stringWidth(name)/2- ValueContainer.getCameraX(),
                 y-((float)fm.getHeight()/2)+fm.getAscent()- ValueContainer.getCameraY());
+
     }
+
 }
