@@ -1,15 +1,15 @@
 package Graph.Visualize;
 import java.awt.*;
-public class ArcObject {
-    private final NodeObject fromNode;
-    private final NodeObject toNode;
+public class CanvasArc {
+    private final CanvasNode fromNode;
+    private final CanvasNode toNode;
     private final String fromForeign;
     private final String toPrimary;
     private int offsetExiting;
     private int offsetEntering;
-    protected ArcObject(NodeObject fromNode, NodeObject toNode,
-                     String fromForeign, String toPrimary, int exitingFKs, int indexExiting,
-                     int enteringFKs, int indexEntering) {
+    protected CanvasArc(CanvasNode fromNode, CanvasNode toNode,
+                        String fromForeign, String toPrimary, int exitingFKs, int indexExiting,
+                        int enteringFKs, int indexEntering) {
         this.fromNode = fromNode;
         this.toNode = toNode;
         this.fromForeign = fromForeign;

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import static Graph.Visualize.CanvasHandler.graph;
 
 public class ValueContainer {
-    //COLORI
+    //COLORS
     private static Color backgroundColor = new Color(25, 28, 33);
     private static Color primaryColor = new Color(122, 130, 227);
     private static Color secondaryColor = new Color(122, 183, 126);
@@ -21,24 +21,24 @@ public class ValueContainer {
     private static int zoomStatus = 2;
     private static final int[] fontSize = {7, 9, 12, 14, 16, 18};
     private static final int[] textToWidthModifier = {4, 6, 8, 9, 11, 13};
+
+    //GUI
     private static boolean savingMode = false;
-
     private static String selectedButton = "";
-
     private static String hoveredButton = "";
+    private static String savingName = null;
 
     //FONT
     private static Font font = new Font("Dialog", Font.PLAIN, 12);
     private static final Font panelFont = new Font("Dialog", Font.PLAIN, 12);
 
-    private static String savingName = null;
-    //DIMENSIONI NODI
+    //DIMENSIONS NODE
     private static int nodeMaxLength = 0;
     private static int nodeWidth = 0;
     private static int nodeHeight = 0;
     private static int nodeOffset = 0;
 
-    //DIMENSIONI CANVAS
+    //DIMENSIONS CANVAS
     private static int canvasWidth = 640;
     private static int canvasHeight = 640/12*9;
     private static final int panelOffset = 20;
@@ -49,7 +49,7 @@ public class ValueContainer {
     private static final ArrayList<String> selectedTree = new ArrayList<>();
 
 
-    /*- get colors -*/
+    /*- COLORS -*/
     protected  static void changeTheme() {
         if (darkTheme) {
             darkTheme = false;
@@ -67,11 +67,15 @@ public class ValueContainer {
             writingColor = new Color(236, 238, 241);
         }
     }
+
+    // pure colors
     protected static Color getBackgroundColor() {  return backgroundColor; }
     protected static Color getPrimaryColor() {  return primaryColor; }
     protected static Color getSecondaryColor() { return secondaryColor; }
     protected static Color getErrorColor() { return errorColor; }
     protected static Color getWritingColor() { return writingColor; }
+
+    //object colors - canvas
     protected static Color getColorOfNode(String name) {
         if (selectedNode.equalsIgnoreCase(name) || graph.getTableType(name) == selectedType)
             return getPrimaryColor();
@@ -103,6 +107,8 @@ public class ValueContainer {
             return new Color(231, 236, 241);
         }
     }
+
+    //object color - buttons
     protected static Color getBackgroundColorOfButton(String name) {
         if (darkTheme) {
             if ((name.equalsIgnoreCase("save"))) {
@@ -135,17 +141,19 @@ public class ValueContainer {
         }
         return getBackgroundColor();
     }
+
+    //object color - panel
     protected static Color getColorOfPanel() {
-        if (darkTheme)
-            return backgroundColor.brighter();
-        else return new Color(208, 217, 231);
-    }
-    protected static Color getColorOfInfoPanel() {
         if (darkTheme)
             return backgroundColor.brighter().brighter();
         else return backgroundColor;
     }
-    protected static Color getColorOfPanelButton() {
+    protected static Color getScrollBarDragged() {
+        if (darkTheme)
+            return backgroundColor.brighter();
+        else return new Color(208, 217, 231);
+    }
+    protected static Color getColorOfScrollBarHover() {
         if (darkTheme)
             return new Color(70, 84, 105);
         else return getSecondaryColor().brighter().brighter().brighter();
@@ -158,6 +166,7 @@ public class ValueContainer {
 
     /*- FONT -*/
     protected static Font getFont() { return font; }
+    protected static Font getPanelFont() { return panelFont; }
 
     /*- NODE DIMENSION -*/
     protected static int getNodeWidth() { return nodeWidth; }
@@ -167,6 +176,7 @@ public class ValueContainer {
     /*- CANVAS DIMENSION -*/
     protected static int getCanvasWidth() { return canvasWidth; }
     protected static int getCanvasHeight() { return canvasHeight; }
+    protected static int getOffset() { return panelOffset; }
 
     protected static void setCanvasSize(int widthCanvas, int heightCanvas) {
         ValueContainer.canvasHeight = heightCanvas;
@@ -181,16 +191,18 @@ public class ValueContainer {
         }
     }
 
-    /*- PANEL DIMENSION -*/
-    protected static Font getPanelFont() { return panelFont; }
-    protected static int getPanelOffset() { return panelOffset; }
-
     /*- SAVING MODE -*/
     protected static boolean isSavingMode() { return savingMode; }
     protected static void setSavingMode() {
         savingMode = !savingMode;
         if (!savingMode && selectedButton.equalsIgnoreCase("save"))
             selectedButton = "";
+    }
+    public static String getSavingName() {
+        return savingName;
+    }
+    public static void setSavingName(String savingName) {
+        ValueContainer.savingName = savingName;
     }
 
     /*- SELECTIONS -*/
@@ -200,6 +212,8 @@ public class ValueContainer {
         ValueContainer.selectedTree.clear();
         ValueContainer.selectedButton = "";
     }
+
+    // buttons
     protected static void setClickedButton (String button) {
         ValueContainer.selectedButton = button;
         ValueContainer.hoveredButton = button;
@@ -207,10 +221,11 @@ public class ValueContainer {
     protected static void setHoveredButton (String button) {
         ValueContainer.hoveredButton = button;
     }
-
     protected static boolean isButtonHovered() {
         return !hoveredButton.equals("");
     }
+
+    // nodes
     protected static Graph.nodeType getSelectedType() { return selectedType; }
     protected static void setSelectedType(Graph.nodeType selectedType, String button) {
         if (selectedType.equals(ValueContainer.getSelectedType())) {
@@ -232,7 +247,8 @@ public class ValueContainer {
     protected static String getSelectedNode() {
         return selectedNode;
     }
-    protected static String[] getTableInfo(String name) {
+
+    protected static String[] getNodeInfo(String name) {
         return graph.getTableInfo(name);
     }
 
@@ -266,11 +282,4 @@ public class ValueContainer {
         nodeOffset = nodeWidth / 4;
     }
 
-    public static String getSavingName() {
-        return savingName;
-    }
-
-    public static void setSavingName(String savingName) {
-        ValueContainer.savingName = savingName;
-    }
 }

@@ -19,31 +19,33 @@ public class Visualize extends JFrame {
     public Visualize(Graph graph) {
         setTitle(graph.getName().toUpperCase() + " :: " + graph.getTableNumber() + " tables");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new GridLayout(1,0));
 
+        setLayout(new GridLayout(1,0));
         setPreferredSize(new Dimension(ValueContainer.getCanvasWidth(),
                 ValueContainer.getCanvasHeight()));
         setMinimumSize(new Dimension(ValueContainer.getCanvasWidth(),
                 ValueContainer.getCanvasHeight()));
-
-        canvasHandler = new CanvasHandler(graph);
-        FontMetrics fm = this.getFontMetrics(ValueContainer.getFont());
-        buttonHandler = new ButtonHandler(fm);
-        canvas = new Canvas(canvasHandler, buttonHandler);
-        getContentPane().add(canvas).setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
         getContentPane().setBackground(ValueContainer.getBackgroundColor());
 
+        FontMetrics fm = this.getFontMetrics(ValueContainer.getPanelFont());
+        canvasHandler = new CanvasHandler(graph);
+        buttonHandler = new ButtonHandler(fm);
+        canvas = new Canvas(canvasHandler, buttonHandler);
+
+        getContentPane().add(canvas).setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
+
         MouseAdapter canvasMouseAdapter = new MouseAdapter() {
-            private NodeObject clicked = null;
+            private CanvasNode clicked = null;
             private Point previous;
             private boolean movingSavingStart;
             private boolean movingSavingEnd;
 
             @Override
             public void mouseMoved(MouseEvent e) {
+                //if I'm not moving any object on the canvas, hover is a thing
                 if (!moving) {
                     if (buttonHandler.hoverOnButton(e.getPoint()) == 1)
-                        canvas.repaint();
+                        repaintAll();
                 }
             }
 
@@ -51,15 +53,16 @@ public class Visualize extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 // If a node is clicked, it will be highlighted, along with its arcs and tree
                 short clickedButton = buttonHandler.clickedButton(e.getPoint());
-                if (clickedButton == 0) {
-                    if ((clicked = canvasHandler.getNodeInThisPoint(e.getX(), e.getY())) != null) {
+                if (clickedButton == 0) { //no button was clicked
+                    if ((clicked = canvasHandler.getNodeInThisPoint(e.getX(), e.getY())) != null) { //a node was clicked
                         ValueContainer.setSelectedNode(clicked.getName());
                     } else {
                         // else, the selections are cleaned
                         ValueContainer.cleanSelection();
                     }
-                } else if (clickedButton == 2)
+                } else if (clickedButton == 2) //saving button was clicked 
                     createImage();
+                
                 repaintAll();
             }
 
@@ -71,12 +74,13 @@ public class Visualize extends JFrame {
                     //if a node is pressed, it's the start of dragging a node, and it will become selected
                     ValueContainer.setSelectedNode(clicked.getName());
                     repaintAll();
-                } else if (canvasHandler.onSavingStart(e.getPoint()) && ValueContainer.isSavingMode()) {
+                } else if (canvasHandler.onFromSavingPoint(e.getPoint()) && ValueContainer.isSavingMode()) {
                     movingSavingStart = true;
-                } else if (canvasHandler.onSavingEnd(e.getPoint()) && ValueContainer.isSavingMode()) {
+                } else if (canvasHandler.onToSavingPoint(e.getPoint()) && ValueContainer.isSavingMode()) {
                     movingSavingEnd = true;
                 }
-                canvasHandler.shouldDrawPanel = false;
+                
+                canvasHandler.shouldDrawPanel = false; //don't draw the panel if something is moving
                 moving = true;
                 previous = e.getPoint();
             }
@@ -88,6 +92,8 @@ public class Visualize extends JFrame {
                 clicked = null;
                 movingSavingEnd = false;
                 movingSavingStart = false;
+                
+                //we can draw the panel again, and will if a node is selected
                 canvasHandler.shouldDrawPanel = true;
                 if (canvasHandler.infoPanel != null) repaintAll();
             }
@@ -100,11 +106,11 @@ public class Visualize extends JFrame {
                         clicked.setY(e.getY() + ValueContainer.getCameraY());
 
                     } else if (movingSavingStart) { //moving a saving point
-                        canvasHandler.take_from_here.x = e.getX() + ValueContainer.getCameraX();
-                        canvasHandler.take_from_here.y = e.getY() + ValueContainer.getCameraY();
+                        canvasHandler.fromSavePoint.x = e.getX() + ValueContainer.getCameraX();
+                        canvasHandler.fromSavePoint.y = e.getY() + ValueContainer.getCameraY();
                     } else if (movingSavingEnd) {
-                        canvasHandler.take_to_here.x = e.getX() + ValueContainer.getCameraX();
-                        canvasHandler.take_to_here.y = e.getY() + ValueContainer.getCameraY();
+                        canvasHandler.toSavePoint.x = e.getX() + ValueContainer.getCameraX();
+                        canvasHandler.toSavePoint.y = e.getY() + ValueContainer.getCameraY();
 
                     } else {//moving the camera
                         ValueContainer.setCameraX((int) (ValueContainer.getCameraX() + (previous.getX() - e.getX())));
@@ -121,10 +127,13 @@ public class Visualize extends JFrame {
             @Override
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
+                //window was resized, I need the things not anchored to top-left
                 JFrame c = (JFrame) e.getComponent();
                 ValueContainer.setCanvasSize(c.getContentPane().getWidth(),
                         c.getContentPane().getHeight());
+
                 setBackground(ValueContainer.getBackgroundColor());
+
                 buttonHandler.updateButtonsWhenResized();
                 canvasHandler.updatePanelX();
                 repaintAll();
@@ -139,7 +148,7 @@ public class Visualize extends JFrame {
     }
 
     private void createImage() {
-        BufferedImage image = new BufferedImage(CanvasHandler.getImageWidth(), CanvasHandler.getImageHeight(), BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = new BufferedImage(canvasHandler.getImageWidth(), canvasHandler.getImageHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = image.createGraphics();
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         rh.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -147,14 +156,14 @@ public class Visualize extends JFrame {
 
         // To avoid drama, the camera is moved where the start of the saving rectangle is
         Point camera = new Point(ValueContainer.getCameraX(), ValueContainer.getCameraY());
-        ValueContainer.setCamera(new Point(CanvasHandler.startOfRect().x,
-                CanvasHandler.startOfRect().y));
+        ValueContainer.setCamera(new Point(canvasHandler.getTopLeftOfSavingArea().x,
+                canvasHandler.getTopLeftOfSavingArea().y));
 
         //  The background is created, nodes are painted upon it
         g2d.setColor(ValueContainer.getBackgroundColor());
-        g2d.fillRect(CanvasHandler.startOfRect().x- ValueContainer.getCameraX(),
-                CanvasHandler.startOfRect().y- ValueContainer.getCameraY(),
-                CanvasHandler.getImageWidth(), CanvasHandler.getImageHeight());
+        g2d.fillRect(canvasHandler.getTopLeftOfSavingArea().x- ValueContainer.getCameraX(),
+                canvasHandler.getTopLeftOfSavingArea().y- ValueContainer.getCameraY(),
+                canvasHandler.getImageWidth(), canvasHandler.getImageHeight());
         canvas.render(g2d, true);
 
         //  The image is saved with textField.png or graphName.png
@@ -176,7 +185,7 @@ public class Visualize extends JFrame {
 
     private void repaintAll() {
         //repaints the canvas and panel
-        canvas.removeAll();
+        //canvas.removeAll();
         canvas.repaint();
     }
 }

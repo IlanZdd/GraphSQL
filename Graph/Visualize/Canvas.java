@@ -13,14 +13,13 @@ public class Canvas extends JPanel {
     protected JTextField textField;
     protected JTextArea textArea;
     protected JScrollPane scrollPane;
-    protected TableInfo infoPanel;
+    protected InfoPanel infoPanel;
 
     protected Canvas(CanvasHandler canvasHandler, ButtonHandler buttonHandler) {
         super();
         this.canvasHandler = canvasHandler;
         this.buttonHandler = buttonHandler;
         this.setLayout(null);
-
     }
 
     @Override
@@ -29,10 +28,11 @@ public class Canvas extends JPanel {
         ValueContainer.setCanvasSize(getWidth(), getHeight());
         setBackground(ValueContainer.getBackgroundColor());
 
+        //adds the text field
         if (this.getComponentCount() == 0) {
             textField = new JTextField();
             add(textField);
-            buttonHandler.addTextfield(textField);
+            buttonHandler.addTextField(textField);
             textField.setOpaque(true);
             textField.setBorder(new TextFieldBorder());
             textField.setFont(ValueContainer.getPanelFont());
@@ -46,10 +46,11 @@ public class Canvas extends JPanel {
             textField.setText(ValueContainer.getSavingName());
         }
 
+        //creates the panel is non-existent/needed
         if (infoPanel == null && ValueContainer.isSelectedNode()) {
             textArea = new JTextArea(){};
             scrollPane = new JScrollPane(textArea);
-            infoPanel = new TableInfo(textArea, scrollPane);
+            infoPanel = new InfoPanel(textArea, scrollPane);
 
             canvasHandler.addInfoPanel(infoPanel);
 
@@ -62,6 +63,7 @@ public class Canvas extends JPanel {
             scrollPane.getVerticalScrollBar().setUI(new BarUI());
         }
 
+        //adds the scroll-pane if needed
         if (this.getComponentCount() == 1 && ValueContainer.isSelectedNode())
             this.add(scrollPane);
 
@@ -70,9 +72,11 @@ public class Canvas extends JPanel {
 
     protected void render(Graphics g, boolean areWeSaving) {
         Graphics2D g2d = (Graphics2D) g;
-        canvasHandler.render(g2d, areWeSaving);
+
+        canvasHandler.render(g2d, areWeSaving); //draws nodes and arcs
+
         if (!areWeSaving) {
-            buttonHandler.render(g2d);
+            buttonHandler.render(g2d); //draws the buttons
             if (infoPanel != null && canvasHandler.shouldDrawPanel)
                 infoPanel.render(g2d);
         }
@@ -147,12 +151,12 @@ public class Canvas extends JPanel {
         protected void paintTrack(Graphics g, JComponent c, Rectangle r) {
             Graphics2D g2 = (Graphics2D)g.create();
             Color color;
-            if(!c.isEnabled() || r.width>r.height) {
+            if (!c.isEnabled() || r.width>r.height) {
                 return;
-            } else if(isDragging) {
+            } else if (isDragging) {
+                color = ValueContainer.getScrollBarDragged();
+            } else {
                 color = ValueContainer.getColorOfPanel();
-            }else {
-                color = ValueContainer.getColorOfInfoPanel();
             }
             g2.setPaint(color);
             g2.fillRect(r.x,r.y,r.width,r.height);
@@ -170,9 +174,9 @@ public class Canvas extends JPanel {
             } else if (isDragging) {
                 color = ValueContainer.getColorOfScrollBar();
             } else if (isThumbRollover()) {
-                color = ValueContainer.getColorOfPanelButton();
+                color = ValueContainer.getColorOfScrollBarHover();
             } else {
-                color = ValueContainer.getColorOfPanel();
+                color = ValueContainer.getScrollBarDragged();
             }
             g2.setPaint(color);
             g2.fillRoundRect(r.x,r.y,r.width,r.height,10,10);

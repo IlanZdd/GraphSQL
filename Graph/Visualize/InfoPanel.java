@@ -6,60 +6,64 @@ import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
 
-public class TableInfo{
-    private NodeObject node;
-    private Point TLpoint;
+public class InfoPanel {
+    private CanvasNode node;
+    private final Point TLpoint;
 
-    private JScrollPane scrollPane;
-    private JTextArea textArea;
+    private final JScrollPane scrollPane;
+    private final JTextArea textArea;
 
 
-    public TableInfo (JTextArea textArea, JScrollPane scrollPane) {
+    public InfoPanel(JTextArea textArea, JScrollPane scrollPane) {
         this.scrollPane = scrollPane;
         this.textArea = textArea;
         this.node = null;
 
-       TLpoint = new Point(ValueContainer.getCanvasWidth()*4/5 - ValueContainer.getPanelOffset(), ValueContainer.getPanelOffset());
+       TLpoint = new Point(ValueContainer.getCanvasWidth()*4/5 - ValueContainer.getOffset(), ValueContainer.getOffset());
     }
 
     protected void render (Graphics2D g2d) {
-        if (ValueContainer.getSelectedNode() == "") return;
+        if (ValueContainer.getSelectedNode().equals("")) return;
 
         g2d.setColor(ValueContainer.getPrimaryColor());
 
+        //sets all the scroll pane/textArea stuff
         textArea.setText(null);
         scrollPane.setBounds(new Rectangle(TLpoint.x, TLpoint.y,
                 ValueContainer.getCanvasWidth()/5, ValueContainer.getCanvasHeight()/2));
-        scrollPane.setBackground(ValueContainer.getColorOfInfoPanel());
+        scrollPane.setBackground(ValueContainer.getColorOfPanel());
         textArea.setBounds(0,0, scrollPane.getWidth()-scrollPane.getVerticalScrollBar().getWidth(), scrollPane.getHeight());
-        textArea.setBorder(new MatteBorder(2,2,2,2+scrollPane.getVerticalScrollBar().getWidth(), ValueContainer.getColorOfInfoPanel()));
-        textArea.setBackground(ValueContainer.getColorOfInfoPanel());
+        textArea.setBorder(new MatteBorder(2,2,2,2+scrollPane.getVerticalScrollBar().getWidth(), ValueContainer.getColorOfPanel()));
+        textArea.setBackground(ValueContainer.getColorOfPanel());
         textArea.setForeground(ValueContainer.getWritingColor());
         textArea.setFont(ValueContainer.getPanelFont());
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setVisible(true);
 
+        //writes the info in the panel
         renderInfo();
 
         textArea.setEditable(false);
-        textArea.setBackground(ValueContainer.getColorOfInfoPanel());
-        scrollPane.setBackground(ValueContainer.getColorOfInfoPanel());
+        textArea.setBackground(ValueContainer.getColorOfPanel());
+        scrollPane.setBackground(ValueContainer.getColorOfPanel());
         //scroll back to top
         textArea.setCaretPosition(0);
         scrollPane.setVisible(true);
 
+        //draws a cute border to the scroll pane
         g2d.setColor(ValueContainer.getWritingColor());
         g2d.drawRect(TLpoint.x, TLpoint.y, scrollPane.getWidth(), scrollPane.getHeight());
+        g2d.drawRect(TLpoint.x-2, TLpoint.y-2, scrollPane.getWidth()+4, scrollPane.getHeight()+4);
     }
 
-    protected void setNode (NodeObject node) {
+    protected void setNode (CanvasNode node) {
         this.node = node;
     }
 
     private void renderInfo() {
         // Writing the table info
-        String[] printedInfo = ValueContainer.getTableInfo(node.getName());
+        String[] printedInfo = ValueContainer.getNodeInfo(node.getName());
         textArea.append("Table: " + printedInfo[0].toUpperCase());
         textArea.append("\n Type: " + printedInfo[1].toUpperCase());
 
@@ -106,7 +110,7 @@ public class TableInfo{
     }
 
     protected void updateX() {
-        TLpoint.x = ValueContainer.getCanvasWidth()*4/5 - ValueContainer.getPanelOffset();
+        TLpoint.x = ValueContainer.getCanvasWidth()*4/5 - ValueContainer.getOffset();
     }
 
 }

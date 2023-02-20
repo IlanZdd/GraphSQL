@@ -7,12 +7,12 @@ import java.awt.BasicStroke;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 
-public class NodeObject {
+public class CanvasNode {
     private int x;
     private int y;
     private final String name;
 
-    protected NodeObject(int x, int y, String name) {
+    protected CanvasNode(int x, int y, String name) {
         this.x = x;
         this.y = y;
         this.name = name;
