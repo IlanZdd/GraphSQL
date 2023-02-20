@@ -4,10 +4,10 @@ The graph's  nodes are the database's tables, connected between each other with 
 For each column, the graph contain information about their name, datatype and datasize, if values can be null, if they are primary keys and if they are auto-increment;
 Foreign Keys contain the additional information of what table and primary key they are referencing, and the ON_DELETE and ON_UPDATE rule.
 
-Calling the **visualize()** method on the graph will open a java application to visualize it: the nodes will be displayed on the left canvas from top to bottom according to topological order, connected by labeled arcs. 
+Calling the **visualize()** method on the graph will open a java application to visualize it: the nodes will be displayed on the canvas from top to bottom according to topological order, connected by labeled arcs. 
 	Clicking on a node will highlight it and its tree, and on the right panel relevant information will appear; the node can be moved around the canvas to reach a less confusing display; the camera can be moved as well.
-	From the panel, it is possible to highlight nodes of a certain type, zoom in and out, switch between light and dark colors, and access the 'help' panel. 
-	Opening the saving mode by clicking on the floppy disk in the panel, two movable dots connected by a dashed line will appear on the canvas, marking the saving area; you can write the custom name writing on the line to the right of the savingMode button (by default, it is the graph name), before saving the image in a .png format clicking on the "V" button. Zoom in before saving for higher resolution.
+	It is possible to highlight nodes of a certain type, zoom in and out, switch between light and dark colors. 
+	Opening the saving mode by clicking on the floppy disk on the bottom left corner, two movable dots connected by a dashed line will appear on the canvas, marking the saving area; you can write the custom name writing on the line to the right of the floppy button (by default, it is the graph name), before saving the image in a .png format clicking on the "V" button. Zoom in before saving for higher resolution (your saving area will follow).
 
 ## CONSTRUCTOR
 
