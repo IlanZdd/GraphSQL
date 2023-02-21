@@ -221,8 +221,11 @@ public class ValueContainer {
     protected static void setHoveredButton (String button) {
         ValueContainer.hoveredButton = button;
     }
-    protected static boolean isButtonHovered() {
+    protected static boolean isHoveredButton() {
         return !hoveredButton.equals("");
+    }
+    protected static String getHoveredButton() {
+        return hoveredButton;
     }
 
     // nodes

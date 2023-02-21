@@ -44,7 +44,9 @@ public class Visualize extends JFrame {
             public void mouseMoved(MouseEvent e) {
                 //if I'm not moving any object on the canvas, hover is a thing
                 if (!moving) {
-                    if (buttonHandler.hoverOnButton(e.getPoint()) == 1)
+                    String previousHover = ValueContainer.getHoveredButton();
+                    if (buttonHandler.hoverOnButton(e.getPoint()) == 1 &&
+                            !ValueContainer.getHoveredButton().equalsIgnoreCase(previousHover))
                         repaintAll();
                 }
             }

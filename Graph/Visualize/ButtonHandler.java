@@ -120,7 +120,7 @@ public class ButtonHandler {
                 }
             }
         }
-        if (ValueContainer.isButtonHovered()) {
+        if (ValueContainer.isHoveredButton()) {
             ValueContainer.setHoveredButton("");
             return 1;
         }
