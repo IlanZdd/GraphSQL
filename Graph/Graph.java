@@ -34,8 +34,9 @@ public class Graph {
      * @param user        Username to access the database [e.g 'root']
      * @param password    Password to access the database
      * @param name        Schema and graph name
+     * @throws SQLException If connection cannot be established
      */
-    public Graph(String DBMS, String server_name, String user, String password, String name){
+    public Graph(String DBMS, String server_name, String user, String password, String name) throws SQLException, RuntimeException{
         this.name = Objects.requireNonNull(name, "Name cannot be null");
         Objects.requireNonNull(DBMS, "DBMS cannot be null");
         try {
@@ -43,7 +44,7 @@ public class Graph {
             this.tables = new ArrayList<>();
             fillGraph(DBConnection.getConn(), DBMS);
         } catch (SQLException se) {
-            throw new RuntimeException(se);
+            throw se;
         } catch (Exception e) {//TODO DELETE WHEN IN REPOSITORY
             throw new RuntimeException(e);
         } finally {
