@@ -205,7 +205,7 @@ public class Graph {
             // From the metadata, gets each column and its datatype, max length, and if it can be null;
             //  if it's autoincrement, it will deduce it's a primary key.
             DatabaseMetaData meta = connection.getMetaData();
-            st = DBConnection.getConn().createStatement();
+            st = connection.createStatement();
             rs = meta.getColumns(null, null, table, null);
             while (rs.next()) {
                 String columnName = rs.getString(4);
@@ -266,33 +266,6 @@ public class Graph {
             DBConnection.closeRs(resultSet);
             DBConnection.closeRs(rs);
             DBConnection.closeSt(st);
-        }
-    }
-
-    /** Clones an existing node, adding it to the graph with a new name; if there is already a node with the new name,
-     * it will be removed.
-     * @param newName      Name of the new node
-     * @param name         Name of the existing node
-     */
-    public void cloneNode(String newName, String name){
-        Objects.requireNonNull(newName, "Parameter newName cannot be null");
-        Objects.requireNonNull(name, "Parameter name cannot be null");
-
-        Node toClone = getNode(name);
-        if (toClone != null) {
-            tables.remove(getNode(newName));
-            toClone.setName(newName);
-            tables.add(toClone);
-        }
-    }
-
-    /** Deletes a node from the list of tables, if it exists.
-     * @param table Node to delete
-     */
-    public void dropNode(String table) {
-        Node node = getNode(table);
-        if (node != null) {
-            tables.remove(node);
         }
     }
 
