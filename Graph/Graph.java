@@ -152,14 +152,14 @@ public class Graph {
                     case "importedKeyCascade" -> "CASCADE";
                     case "importedKeySetNull" -> "SET NULL";
                     case "importedKeySetDefault" -> "SET DEFAULT";
-                    case "importedKeyNoAction", "importedKeyRestrict", default -> "RESTRICT";
+                    default -> "RESTRICT";
                 };
 
                 String onUpdate = switch (rs.getString("UPDATE_RULE")) {
                     case "importedKeyCascade" -> "CASCADE";
                     case "importedKeySetNull" -> "SET NULL";
                     case "importedKeySetDefault" -> "SET DEFAULT";
-                    case "importedNoAction", "importedKeyRestrict", default -> "RESTRICT";
+                    default -> "RESTRICT";
                 };
 
                 n.changeColumnToForeignKey(rs.getString("FKCOLUMN_NAME"),
