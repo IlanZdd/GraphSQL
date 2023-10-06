@@ -1,12 +1,11 @@
 import Graph.Graph;
-import Utils.DBConnection;
 
 public class Main {
     public static void main (String[] args) throws Exception {
-        DBConnection.setConn("mysql", "localhost:3306", "root", "Password_123", "classicmodels");
-        Graph g = new Graph("mysql", DBConnection.getConn(), "classicmodels");/*
-        Graph g1 = new Graph("sqlite", "", "", "", "/home/ilan/Downloads/pokemon_db.db");
-
+        //DBConnection.setConn("mysql", "localhost:3306", "root", "Password_123", "classicmodels");
+        Graph g = new Graph("mysql", "localhost:3306", "root", "Password_123", "sakila");
+        //Graph g = new Graph("sqlite", "", "", "", "sakila_master.db");
+/*
         System.out.println("\t" + "graph name : " + g.getName());
         System.out.println("\t" + "list tables : " + Arrays.toString(g.listTables().toArray()));
         System.out.println("\t" + "list arcs : ");

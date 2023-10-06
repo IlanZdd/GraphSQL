@@ -10,61 +10,22 @@ public class ForeignKeyColumn extends Column implements Comparable{
     /** Action set on the database if the foreign key is updated     */
     private final String onUpdate;
 
-    /** Constructor: Creates a new foreign key, that is not also a primary key.
-     * @param foreignKey Name of column
-     * @param referencedPrimaryKey Primary key referred by this FK
-     * @param referencedTable Table referred by this FK
-     * @param datatype Type of data
-     * @param columnSize Max size of values
-     * @param isNullable TRUE if values can be null
-     * @param onDelete Action the DB will take on delete
-     * @param onUpdate Action the DB will take on update
-     */
-    protected ForeignKeyColumn(String foreignKey, String referencedPrimaryKey,
-                               String referencedTable, int datatype, int columnSize,
-                               boolean isNullable, String onDelete, String onUpdate) {
-        super(foreignKey, datatype, columnSize, isNullable);
-        this.referencedPrimaryKey = referencedPrimaryKey;
-        this.referencedTable = referencedTable;
-        this.onDelete = onDelete;
-        this.onUpdate = onUpdate;
-    }
-
-
     /** Constructor: Creates a new foreign key, that can also be a primary key.
      * @param foreignKey Name of column
      * @param isPK if TRUE the column is a primary key
      * @param referencedPrimaryKey Primary key referred by this FK
      * @param referencedTable Table referred by this FK
      * @param datatype Type of data
+     * @param isNullable if column can be null
      * @param columnSize Max size of values
      * @param isAutoIncrement TRUE if column is autoincrement
      * @param onDelete Action the DB will take on delete
      * @param onUpdate Action the DB will take on update
      */
-    protected ForeignKeyColumn(String foreignKey, boolean isPK, String referencedPrimaryKey,
-                               String referencedTable, int datatype, int columnSize,
-                               boolean isAutoIncrement, String onDelete, String onUpdate) {
-        super(foreignKey, datatype, columnSize, isPK, isAutoIncrement);
-        this.referencedPrimaryKey = referencedPrimaryKey;
-        this.referencedTable = referencedTable;
-        this.setNullable(false);
-        this.onDelete = onDelete;
-        this.onUpdate = onUpdate;
-    }
-
-    /** Constructor: Turns an existing column into a Foreign key.
-     * @param column Column to transform
-     * @param referencedPrimaryKey Primary key referred by this FK
-     * @param referencedTable Table referred by this FK
-     * @param onDelete Action the DB will take on delete
-     * @param onUpdate Action the DB will take on update
-     */
-    protected ForeignKeyColumn(Column column, String referencedPrimaryKey, String referencedTable,
-                               String onDelete, String onUpdate) {
-        super(column.getName(), column.getDatatype(), column.getColumnSize(), column.isNullable());
-        this.setPrimaryKey(column.isPrimaryKey());
-        this.setAutoIncrementing(column.isAutoIncrementing());
+    protected ForeignKeyColumn(String foreignKey,int datatype, int columnSize, boolean isPK,
+                               boolean isAutoIncrement, boolean isNullable, String referencedPrimaryKey,
+                               String referencedTable, String onDelete, String onUpdate) {
+        super(foreignKey, datatype, columnSize, isPK, isAutoIncrement, isNullable);
         this.referencedPrimaryKey = referencedPrimaryKey;
         this.referencedTable = referencedTable;
         this.onDelete = onDelete;

@@ -1,7 +1,9 @@
 package Graph;
 
-import Utils.DBConnection;
+import Utils.ColumnInfoDTO;
 import Graph.Visualize.Visualize;
+import Utils.DBConnectionFactory;
+import Utils.IDBConnection;
 
 import java.sql.*;
 import java.util.*;
@@ -36,238 +38,46 @@ public class Graph {
      * @param name        Schema and graph name
      * @throws SQLException If connection cannot be established
      */
-    public Graph(String DBMS, String server_name, String user, String password, String name) throws SQLException, RuntimeException{
+    public Graph(String DBMS, String server_name, String user, String password, String name) {
         this.name = Objects.requireNonNull(name, "Name cannot be null");
         Objects.requireNonNull(DBMS, "DBMS cannot be null");
-        try {
-            DBConnection.setConn(DBMS, server_name, user, password, name);
-            this.tables = new ArrayList<>();
-            fillGraph(DBConnection.getConn(), DBMS);
-        } catch (SQLException se) {
-            throw se;
-        } catch (Exception e) {//TODO DELETE WHEN IN REPOSITORY
-            throw new RuntimeException(e);
-        } finally {
-            DBConnection.closeConn();
-        }
-    }
 
-    /** Receives an existing connection from the user to access the database (will not be closed).
-     * For each table, it extracts the Primary Keys, Foreign Keys and other columns, each with datatype, column size,
-     * and if nullable to create an oriented graph.
-     * @param DBMS       DBMS [Supported: MySQL, SQLite]
-     * @param connection Already established connection to the database
-     * @param name       Schema and graph name
-     */
-    public Graph (String DBMS, Connection connection, String name) throws SQLException {
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
-        Objects.requireNonNull(DBMS, "DBMS cannot be null");
-        Objects.requireNonNull(connection, "Connection cannot be null");
-
+        IDBConnection connector = DBConnectionFactory.setConn(DBMS, server_name, user, password, name);
         this.tables = new ArrayList<>();
-        fillGraph(connection, DBMS);
+
+        try {
+            fillGraph(connector);
+        } finally {
+            connector.closeConn();
+        }
     }
 
     /** Visits each table to create the graph, using different methods according to the DBMS.<br>
      * Sets the node's types.
      * @param connection Connection to the database
-     * @param DBMS DBMS [Supported: MySQL, SQLite]
      */
-    private  void fillGraph(Connection connection, String DBMS) throws SQLException {
-        List<String> allTables =  extractTableNames(connection);
-        while (allTables.size()>0) {
+    private  void fillGraph(IDBConnection connection) {
+        List<String> allTables = connection.getTableNames();
+        while (!allTables.isEmpty()) {
             String tt = allTables.remove(0);
-            switch (DBMS.toLowerCase()) {
-                case "mysql" -> extractColumnData(connection, tt);
-                case "sqlite" -> extractForeignKeysSQLite(connection, tt);
+            Node n = new Node(tt);
+
+            Map<String, ColumnInfoDTO> map = connection.getColumnData(tt);
+            for (ColumnInfoDTO column : map.values()) {
+                if (column.isFK())
+                    n.addForeignKey(column.getName(), column.getDataType(), column.getColumnSize(),
+                            column.isPK(), column.isAutoIncrement(), column.isNullable(),
+                            column.getReferencedPrimaryKey(), column.getReferencedTable(),
+                            column.getOnDelete(), column.getOnUpdate());
+                else
+                    n.addColumn(column.getName(), column.getDataType(), column.getColumnSize(),
+                            column.isPK(), column.isAutoIncrement(), column.isNullable());
             }
+            n.setRecordNumber(connection.countRows(tt));
+
+            tables.add(n);
         }
         setTypes();
-    }
-
-    /** Extracts from the database's metadata the names of the tables;
-     * returns an empty list if there are no tables.
-     * @param connection Connection to the database
-     * @return List of table names
-     */
-    private List<String> extractTableNames(Connection connection) throws SQLException {
-        List<String> table_names = new ArrayList<>();
-        ResultSet result_set = null;
-        try {
-            DatabaseMetaData meta = connection.getMetaData();
-            String[] types = {"TABLE"};
-            result_set = meta.getTables(name, "dbo", "%", types);
-            while (result_set.next()) {
-                table_names.add(result_set.getString("TABLE_NAME"));
-            }
-        } catch (SQLException se) {
-            throw new SQLException(se);
-        } finally {
-            DBConnection.closeRs(result_set);
-        }
-        return table_names;
-    }
-
-    /** For DBMS: MysQL.<br>
-     * Extracts the primary keys, foreign keys and plain column for a MySql database, using metadata;
-     * updates the tables according to discoveries.
-     * @param connection Connection to DB
-     * @param table      Exploring table
-     */
-    private void extractColumnData(Connection connection, String table) throws SQLException, RuntimeException {
-        Statement st = null;
-        ResultSet rs = null;
-        try {
-            Node n = new Node(table);
-
-            // From the metadata, gets each column and its datatype, column size, and if it can be null;
-            //  if it's autoincrement, it will deduce it's a primary key.
-            DatabaseMetaData meta = connection.getMetaData();
-            rs = meta.getColumns(name, null, table, "%");
-            while (rs.next()) {
-                if (rs.getString("IS_AUTOINCREMENT").equalsIgnoreCase("YES"))
-                    n.addPrimaryKey(rs.getString("COLUMN_NAME"),
-                            rs.getInt("DATA_TYPE"),
-                            rs.getInt("COLUMN_SIZE"),
-                            true);
-                else n.addColumn(rs.getString("COLUMN_NAME"),
-                        rs.getInt("DATA_TYPE"),
-                        rs.getInt("COLUMN_SIZE"),
-                        rs.getString("IS_NULLABLE").equalsIgnoreCase("YES"));
-            }
-            rs.close();
-
-            // Searches the metadata for non-autoincrement primary keys, turning the already added plain columns.
-            rs = meta.getPrimaryKeys(name, null,table);
-            while (rs.next()) {
-                n.changeColumnToPrimaryKey(rs.getString("COLUMN_NAME"));
-            }
-            rs.close();
-
-            // Searches the metadata for foreign keys, turning the already added plain columns.
-            //  For each, it gets the on_delete and on_update rules, the referred table and referred primary key.
-            rs = meta.getImportedKeys(name, null, table);
-            while (rs.next()) {
-                String onDelete = switch (rs.getString("DELETE_RULE")) {
-                    case "importedKeyCascade" -> "CASCADE";
-                    case "importedKeySetNull" -> "SET NULL";
-                    case "importedKeySetDefault" -> "SET DEFAULT";
-                    default -> "RESTRICT";
-                };
-
-                String onUpdate = switch (rs.getString("UPDATE_RULE")) {
-                    case "importedKeyCascade" -> "CASCADE";
-                    case "importedKeySetNull" -> "SET NULL";
-                    case "importedKeySetDefault" -> "SET DEFAULT";
-                    default -> "RESTRICT";
-                };
-
-                n.changeColumnToForeignKey(rs.getString("FKCOLUMN_NAME"),
-                        rs.getString("PKCOLUMN_NAME"),
-                        rs.getString("PKTABLE_NAME"),
-                        onDelete, onUpdate);
-            }
-            rs.close();
-
-            // Counts the number of records in the table.
-            String query = "SELECT count(*) FROM " + this.getName() + "."+ table;
-            st = connection.createStatement();
-            rs = st.executeQuery(query);
-            while (rs.next()) {
-                n.setRecordNumber(rs.getInt(1));
-            }
-
-            tables.add(n);
-        } catch (SQLException se) {
-            throw new SQLException(se);
-        } catch (NoSuchFieldException e) {
-            System.out.println("Error in graph generation: tried to access a non-existing column.");
-            throw new RuntimeException(e);
-        } finally {
-            DBConnection.closeRs(rs);
-            DBConnection.closeSt(st);
-        }
-    }
-
-    /** For DBMS: SQLite.<br>
-     * Extracts the primary keys, foreign keys and plain column for a MySql database, using metadata;
-     * updates the tables according to discoveries.
-     * @param connection Connection to DB
-     * @param table      Exploring table
-     */
-    private void extractForeignKeysSQLite(Connection connection, String table) throws SQLException, RuntimeException {
-        Statement st = null;
-        ResultSet rs = null;
-        ResultSet resultSet = null;
-        try {
-            Node n = new Node(table);
-            String query;
-
-            // From the metadata, gets each column and its datatype, max length, and if it can be null;
-            //  if it's autoincrement, it will deduce it's a primary key.
-            DatabaseMetaData meta = connection.getMetaData();
-            st = connection.createStatement();
-            rs = meta.getColumns(null, null, table, null);
-            while (rs.next()) {
-                String columnName = rs.getString(4);
-                int columnType = rs.getInt(5);
-                boolean isNullable = rs.getBoolean("IS_NULLABLE");
-                boolean autoincrement = rs.getBoolean("IS_AUTOINCREMENT");
-
-                query = "SELECT max(length(" + columnName + ")) AS max_column_size FROM " + table;
-                resultSet = st.executeQuery(query);
-                int columnSize = -1;
-                while (resultSet.next())
-                    columnSize = resultSet.getInt(1);
-
-                if (autoincrement)
-                    n.addPrimaryKey(columnName, columnType, columnSize, true);
-                else n.addColumn(columnName, columnType, columnSize, isNullable);
-            }
-
-            // Queries for non-autoincrement primary keys, turning the already added plain columns;
-            //  sets the nullability for those.
-            query =  "PRAGMA table_info(" + table + ")";
-            rs = st.executeQuery(query);
-            while (rs.next()) {
-                if (rs.getInt(6) > 0)
-                    n.changeColumnToPrimaryKey(rs.getString(2));
-                if (rs.getInt(4) == 0)
-                    n.setNullable(rs.getString(2), true);
-            }
-
-            // Queries for foreign keys, turning the already added plain columns.
-            //  For each, it gets the on_delete and on_update rules, the referred table and referred primary key.
-            query = "PRAGMA foreign_key_list(" + table + ")";
-            rs = st.executeQuery(query);
-            while (rs.next()) {
-                n.changeColumnToForeignKey(rs.getString(4),
-                        rs.getString(5),
-                        rs.getString(3),
-                        rs.getString(7),
-                        rs.getString(6));
-            }
-
-            // Counts the number of records in the table.
-            query = "SELECT count(*) FROM " + table;
-            st = connection.createStatement();
-            rs = st.executeQuery(query);
-            while (rs.next()) {
-                n.setRecordNumber(rs.getInt(1));
-            }
-
-            tables.add(n);
-        } catch (SQLException se) {
-            throw new SQLException(se);
-        } catch (NoSuchFieldException e) {
-            System.out.println("Error in graph generation: tried to access a non-existing column.");
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        } finally {
-            DBConnection.closeRs(resultSet);
-            DBConnection.closeRs(rs);
-            DBConnection.closeSt(st);
-        }
     }
 
     /** Searches a node and return it */

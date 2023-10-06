@@ -87,69 +87,39 @@ public class Node {
         return name;
     }
 
-    /** Turns an existing plain column into a Primary Key column.
-     * @param columnName Column name
-     * @throws NoSuchFieldException If there is no column with a given name
-     */
-    protected void changeColumnToPrimaryKey(String columnName) throws NoSuchFieldException, IllegalArgumentException {
-        if (!(columnName == null) && !columnName.isEmpty()) {
-            Column c;
-            if ((c = this.contains(columnName)) == null)
-                throw new NoSuchFieldException("Column should already exist, but it does not.");
-            else {
-                c.setPrimaryKey(true);
-            }
-        } else throw new IllegalArgumentException("No column name was passed as parameter.");
-    }
-
-    /** Creates a new column as a Primary Key column with the given parameters,
-     * if there isn't already a column with such name.
-     * @param name Column name
-     * @param datatype Type of data
-     * @param columnSize Size of data (or max size in the table for SQLite)
-     * @param isAutoIncrementing True if the column is an autoincrement primary key
-     */
-    protected void addPrimaryKey(String name, int datatype, int columnSize,
-                                 boolean isAutoIncrementing) throws IllegalArgumentException {
-        if (name != null && !name.isEmpty()) {
-            if (this.contains(name) == null) {
-                columns.add(new Column(name, datatype, columnSize, true, isAutoIncrementing));
-            }
-        } else throw new IllegalArgumentException("Parameters can't be null or empty");
-    }
-
-    /** Turns an existing plain column into a Foreign Key column.
-     * @param name Column name
-     * @param referredPK Primary key referred by this column
-     * @param referredTable Table referred by this column
-     * @param onDelete Action the database will take on delete
-     * @param onUpdate Action the database will take on update
-     * @throws NoSuchFieldException If there is no column with a given name
-     */
-    protected void changeColumnToForeignKey(String name, String referredPK, String referredTable,
-                                            String onDelete, String onUpdate) throws NoSuchFieldException {
-        if (name != null && !name.isEmpty() &&
-                referredPK != null && !referredPK.isEmpty() &&
-                referredTable != null && !referredTable.isEmpty()) {
-            Column c;
-            if ((c = this.contains(name)) != null) {
-                columns.remove(c);
-                columns.add(new ForeignKeyColumn(c, referredPK, referredTable, onDelete, onUpdate));
-             } else
-                throw new NoSuchFieldException("Column should already exist, but it does not.");
-        } else throw new IllegalArgumentException("Parameters can't be null or empty");
-    }
-
     /** Adds a new plain column to the node, if there isn't already a column with such name.
      * @param name Column name
      * @param datatype Type of data
      * @param columnSize Size of data (or max size in the table for SQLite)
      * @param isNullable True if the column value can be null
      */
-    protected void addColumn(String name, int datatype, int columnSize, boolean isNullable) {
+    protected void addColumn(String name, int datatype, int columnSize, boolean isPrimaryKey, boolean isAutoincrement, boolean isNullable) {
         if (name != null && !name.isEmpty()) {
             if (this.contains(name) == null) {
-                columns.add(new Column(name, datatype, columnSize, isNullable));
+                columns.add(new Column(name, datatype, columnSize, isPrimaryKey, isAutoincrement, isNullable));
+            }
+        } else throw new IllegalArgumentException("Parameters can't be null or empty");
+    }
+
+    /**
+     * Adds a new plain column to the node, if there isn't already a column with such name.
+     *
+     * @param name                 Column name
+     * @param datatype             Type of data
+     * @param columnSize           Size of data (or max size in the table for SQLite)
+     * @param isNullable           True if the column value can be null
+     * @param referencedPrimaryKey column referenced by the foreign key
+     * @param referencedTable      table referenced by the foreign key
+     * @param onDelete             action taken by the db on delete queries
+     * @param onUpdate             action taken by the db on update queries
+     */
+    protected void addForeignKey(String name, int datatype, int columnSize, boolean isPrimaryKey,
+                                 boolean isAutoincrement, boolean isNullable, String referencedPrimaryKey,
+                                 String referencedTable, String onDelete, String onUpdate) {
+        if (name != null && !name.isEmpty()) {
+            if (this.contains(name) == null) {
+                columns.add(new ForeignKeyColumn(name, datatype, columnSize, isPrimaryKey, isAutoincrement, isNullable,
+                        referencedPrimaryKey, referencedTable, onDelete, onUpdate));
             }
         } else throw new IllegalArgumentException("Parameters can't be null or empty");
     }

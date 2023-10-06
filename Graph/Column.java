@@ -23,29 +23,15 @@ public class Column {
      * @param columnSize Max size of values
      * @param isPrimaryKey TRUE if column is a primary key
      * @param isAutoIncrementing TRUE if column is autoincrement
+     * @param isNullable TRUE if column can contain NULL
      */
-    protected Column(String name, int datatype, int columnSize, boolean isPrimaryKey, boolean isAutoIncrementing) {
+    protected Column(String name, int datatype, int columnSize, boolean isPrimaryKey, boolean isAutoIncrementing, boolean isNullable) {
         this.name = name;
         this.datatype = datatype;
         this.columnSize = columnSize;
         this.isPrimaryKey = isPrimaryKey;
         this.isAutoIncrementing = isAutoIncrementing;
-        this.isNullable = false;
-    }
-
-
-    /** Constructor: Creates a new plain column
-     * @param name Column name
-     * @param datatype Type of data
-     * @param columnSize Max size of values
-     */
-    protected Column(String name, int datatype, int columnSize, boolean isNullable) {
-        this.name = name;
-        this.datatype = datatype;
-        this.columnSize = columnSize;
         this.isNullable = isNullable;
-        this.isPrimaryKey = false;
-        this.isAutoIncrementing = false;
     }
 
     /** Return the column's name.
