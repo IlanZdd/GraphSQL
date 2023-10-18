@@ -11,13 +11,13 @@ Calling the **visualize()** method on the graph will open a java application to 
 
 ## CONSTRUCTOR
 
-The graph can be created by either of the two constructor:
-
-  - **Graph(Connection, Schema)**: the constructor requires an already established connection as a parameter, and the schema name that will be used as graph name.
+The graph can be created with the constructor:
 
   - **Graph (ServerURL, Username, Password, Schema)**: the constructor tries to establish a new temporary connection to the Database using the given URL, Username and Password; the schema will be used as graph name. The connection will be closed at the end.
   
   The nodes type are set before returning the object.
+
+  The connection constructor has been removed.
 
 ## METHODS
 
